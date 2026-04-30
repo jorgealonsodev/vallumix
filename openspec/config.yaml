@@ -1,0 +1,71 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: Rust 2021, MSRV 1.75, Cargo workspace with 5 crates
+  Architecture: Trait-based modular design (Control, Reporter, Profile traits), Screaming Architecture by crate
+  Testing: cargo test (built-in), assert_cmd (integration), insta (snapshots), predicates
+  Style: clippy pedantic, rustfmt, deny(missing_docs) on public items
+
+strict_tdd: true
+
+testing:
+  ## Testing Capabilities
+  strict_tdd: true
+  detected: 2026-04-30
+
+  test_runner:
+    command: cargo test
+    framework: Rust built-in (cargo test)
+
+  layers:
+    unit:
+      available: true
+      tool: cargo test (built-in)
+    integration:
+      available: true
+      tool: assert_cmd + predicates
+    e2e:
+      available: false
+      tool: —
+
+  coverage:
+    available: true
+    command: cargo-tarpaulin
+
+  quality:
+    linter:
+      available: true
+      command: cargo clippy -- -D warnings
+    type_checker:
+      available: true
+      command: cargo check
+    formatter:
+      available: true
+      command: cargo fmt
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify affected crates/modules
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group tasks by phase (infrastructure, implementation, testing)
+    - Use hierarchical numbering (1.1, 1.2, etc.)
+    - Keep tasks small enough to complete in one session
+  apply:
+    - Follow existing code patterns and conventions
+    - Load relevant coding skills for the project stack
+    tdd: true
+    test_command: cargo test
+  verify:
+    test_command: cargo test
+    build_command: cargo build
+    coverage_threshold: 80
+  archive:
+    - Warn before merging destructive deltas (large removals)

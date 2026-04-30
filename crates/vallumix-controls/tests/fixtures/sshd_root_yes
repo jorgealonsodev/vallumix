@@ -1,0 +1,2 @@
+PermitRootLogin yes
+Port 22

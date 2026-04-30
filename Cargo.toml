@@ -1,0 +1,48 @@
+[workspace]
+members = [
+    "crates/vallumix-core",
+    "crates/vallumix-controls",
+    "crates/vallumix-reporters",
+    "crates/vallumix-backup",
+    "crates/vallumix-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+authors = ["Vallumix Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/vallumix/vallumix"
+rust-version = "1.75"
+
+[workspace.dependencies]
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+toml = "0.8"
+nix = "0.27"
+walkdir = "2.5"
+owo-colors = "4.0"
+anyhow = "1.0"
+tempfile = "3.10"
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+askama = "0.12"
+quick-xml = "0.36"
+indicatif = "0.17"
+clap_complete = "4.5"
+rayon = "1.10"
+insta = "1.39"
+assert_cmd = "2.0"
+predicates = "3.1"
+
+# Internal crates (always use workspace = true in member Cargo.toml)
+vallumix-core = { path = "crates/vallumix-core" }
+vallumix-controls = { path = "crates/vallumix-controls" }
+vallumix-reporters = { path = "crates/vallumix-reporters" }
+vallumix-backup = { path = "crates/vallumix-backup" }
+vallumix-cli = { path = "crates/vallumix-cli" }

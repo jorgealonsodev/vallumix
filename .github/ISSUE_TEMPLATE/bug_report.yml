@@ -1,0 +1,56 @@
+name: Bug Report
+description: File a bug report
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of vallumix are you running?
+      placeholder: "e.g., 0.0.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: distro
+    attributes:
+      label: Distribution
+      description: What Linux distribution are you using?
+      options:
+        - Debian 12
+        - Ubuntu 22.04
+        - Ubuntu 24.04
+        - Rocky Linux 9
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Run '...'
+        2. See error
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Please copy and paste any relevant log output.
+      render: shell

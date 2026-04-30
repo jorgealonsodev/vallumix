@@ -1,0 +1,17 @@
+[package]
+name = "vallumix-backup"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+vallumix-core = { workspace = true }
+chrono = { workspace = true }
+sha2 = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
