@@ -39,6 +39,11 @@ jobs:
           cargo install mdbook-admonish --version 1.18 --locked || cargo install mdbook-admonish --locked
           cargo install mdbook-linkcheck --locked
 
+      - name: Install mdbook-admonish assets
+        run: |
+          mdbook-admonish install docs/es
+          mdbook-admonish install docs/en
+
       - name: Build Spanish docs
         run: mdbook build docs/es
 
