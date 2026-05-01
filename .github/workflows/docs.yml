@@ -34,10 +34,10 @@ jobs:
 
       - name: Install mdBook and plugins
         run: |
-          cargo install mdbook --version 0.4.43 --locked || cargo install mdbook --locked
-          cargo install mdbook-mermaid --version 0.14 --locked || cargo install mdbook-mermaid --locked
-          cargo install mdbook-admonish --version 1.18 --locked || cargo install mdbook-admonish --locked
-          cargo install mdbook-linkcheck --locked
+          cargo install mdbook --version 0.4.43 --locked
+          cargo install mdbook-mermaid --version 0.14.0 --locked
+          cargo install mdbook-admonish --version 1.18.0 --locked
+          cargo install mdbook-linkcheck --version 0.7.1 --locked
 
       - name: Install mdbook-admonish assets
         run: |
