@@ -7,6 +7,10 @@
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-MIT)
 [![MSRV](https://img.shields.io/badge/MSRV-1.75-orange.svg)](https://blog.rust-lang.org/2023/12/28/Rust-1.75.0.html)
 
+<p align="center">
+  <img src="img/valumix.png" alt="Vallumix" width="600">
+</p>
+
 **Vallumix is a modular Linux hardening engine that automates CIS Benchmark compliance through a single static binary.** Written in Rust and designed for production environments, it applies idempotent security controls, generates auditable reports, and rolls back changes safely — all without runtime dependencies or interpreters.
 
 ## Why Vallumix?

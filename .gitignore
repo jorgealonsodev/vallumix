@@ -1,5 +1,4 @@
 /target
-Cargo.lock
 *.swp
 *.swo
 *~
@@ -9,5 +8,4 @@ Cargo.lock
 *.iml
 .atl/
 .windsurf/
-img/
 man/*.1
