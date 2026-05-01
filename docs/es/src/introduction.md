@@ -1,5 +1,9 @@
 # Introducción
 
+<p align="center">
+  <img src="/vallumix/img/valumix.png" alt="Vallumix" width="640">
+</p>
+
 Vallumix es un motor modular de endurecimiento para sistemas Linux, escrito en Rust y alineado con los benchmarks del Center for Internet Security (CIS). Automatiza la aplicación de controles de seguridad en servidores, eliminando la inconsistencia del hardening manual y generando reportes de cumplimiento trazables para auditorías.
 
 ## ¿Qué hace Vallumix?

@@ -1,5 +1,9 @@
 # Introduction
 
+<p align="center">
+  <img src="/vallumix/img/valumix.png" alt="Vallumix" width="640">
+</p>
+
 Vallumix is a modular hardening engine for Linux systems, written in Rust and aligned with the Center for Internet Security (CIS) benchmarks. It automates the application of security controls on servers, eliminating the inconsistency of manual hardening and generating traceable compliance reports for audits.
 
 ## What Does Vallumix Do?
