@@ -40,8 +40,8 @@ jobs:
 
       - name: Install mdbook-admonish assets
         run: |
-          mdbook-admonish install docs/es
-          mdbook-admonish install docs/en
+          cd docs/es && mdbook-admonish install
+          cd docs/en && mdbook-admonish install
 
       - name: Build Spanish docs
         run: mdbook build docs/es
