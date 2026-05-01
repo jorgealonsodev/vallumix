@@ -1,0 +1,17 @@
+---
+source: crates/vallumix-reporters/src/junit.rs
+expression: output
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="vallumix" tests="4" failures="1" skipped="1" errors="0">
+  <testcase name="1" classname="A">
+  </testcase>
+  <testcase name="2" classname="B">
+    <failure message="fix me">bad</failure>
+  </testcase>
+  <testcase name="3" classname="C">
+    <skipped message="skipped"/>
+  </testcase>
+  <testcase name="4" classname="D &amp; E &lt;test&gt;">
+  </testcase>
+</testsuite>

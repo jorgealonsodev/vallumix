@@ -6,6 +6,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+description = "Vallumix CLI — CIS Linux hardening tool"
+readme = "README.md"
+keywords = ["cis", "linux", "hardening", "compliance", "security"]
+categories = ["command-line-utilities"]
 
 [[bin]]
 name = "vallumix"
@@ -27,6 +31,31 @@ indicatif = { workspace = true }
 clap_complete = { workspace = true }
 chrono = { workspace = true }
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [dev-dependencies]
 assert_cmd = { workspace = true }
 predicates = { workspace = true }
+clap_mangen = { workspace = true }
+
+[package.metadata.deb]
+maintainer = "Vallumix Contributors <vallumix@example.com>"
+section = "admin"
+priority = "optional"
+depends = "libc6"
+assets = [
+    ["target/release/vallumix", "usr/bin/vallumix", "755"],
+    ["../../man/vallumix.1", "usr/share/man/man1/vallumix.1", "644"],
+    ["target/release/completions/vallumix.bash", "usr/share/bash-completion/completions/vallumix", "644"],
+    ["target/release/completions/_vallumix", "usr/share/zsh/vendor-completions/_vallumix", "644"],
+]
+
+[package.metadata.generate-rpm]
+assets = [
+    { source = "target/release/vallumix", dest = "/usr/bin/vallumix", mode = "755" },
+    { source = "../../man/vallumix.1", dest = "/usr/share/man/man1/vallumix.1", mode = "644" },
+]
+auto-req = "no"
+license = "MIT OR Apache-2.0"

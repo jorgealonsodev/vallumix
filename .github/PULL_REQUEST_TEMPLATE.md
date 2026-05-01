@@ -12,8 +12,11 @@ Closes #
 
 ## Checklist
 
-- [ ] `cargo build` passes
-- [ ] `cargo test` passes
-- [ ] `cargo clippy -- -D warnings` passes
-- [ ] `cargo fmt --check` passes
-- [ ] Documentation updated (if applicable)
+- [ ] Tests added or updated for new/changed code
+- [ ] `cargo clippy --workspace -- -D warnings` passes cleanly
+- [ ] `cargo fmt --all -- --check` passes
+- [ ] `cargo test --workspace` passes
+- [ ] CHANGELOG.md updated (under `[Unreleased]`)
+- [ ] Documentation updated in both English and Spanish (`docs/en/` and `docs/es/`)
+- [ ] New control mapped in `controls/README.md` (if applicable)
+- [ ] No `.unwrap()` or `.expect()` calls in production code paths

@@ -9,11 +9,17 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.0.1"
+version = "1.0.0"
 edition = "2021"
 authors = ["Vallumix Contributors"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/vallumix/vallumix"
+repository = "https://github.com/jorgealonsodev/vallumix"
+homepage = "https://github.com/jorgealonsodev/vallumix"
+documentation = "https://github.com/jorgealonsodev/vallumix#readme"
+description = "Vallumix — CIS Linux hardening and compliance toolkit"
+keywords = ["cis", "linux", "hardening", "compliance", "security"]
+categories = ["command-line-utilities"]
+publish = false
 rust-version = "1.75"
 
 [workspace.dependencies]
@@ -35,6 +41,7 @@ askama = "0.12"
 quick-xml = "0.36"
 indicatif = "0.17"
 clap_complete = "4.5"
+clap_mangen = "0.2"
 rayon = "1.10"
 insta = "1.39"
 assert_cmd = "2.0"

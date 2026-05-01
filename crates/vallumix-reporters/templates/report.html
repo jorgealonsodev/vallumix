@@ -81,7 +81,7 @@
           <td>
             {% if control.status == "Compliant" %}
               <span class="badge badge-pass">Compliant</span>
-            {% elif control.status == "NonCompliant" %}
+            {% else if control.status == "NonCompliant" %}
               <span class="badge badge-fail">Non-Compliant</span>
             {% else %}
               <span class="badge badge-skip">{{ control.status }}</span>

@@ -7,7 +7,7 @@
 
 ## Phase 1: Test Infrastructure — Shared Helpers
 
-### T-001 — test-coverage
+### [x] T-001 — test-coverage
 **Capability**: test-coverage
 **Description**: Create `services/common.rs` unit tests — test `ServiceDisable::new()`, `check()` compliant/non-compliant, `apply()` writes disable drop-in, `rollback()` restores
 **TDD Expectations**:
@@ -17,7 +17,7 @@
 **Dependencies**: None
 **Files affected**: `crates/vallumix-controls/src/services/common.rs`
 
-### T-002 — test-coverage
+### [x] T-002 — test-coverage
 **Capability**: test-coverage
 **Description**: Create `network/common.rs` unit tests — test `SysctlControl::new()`, `check()` reads /proc/sys correctly, `apply()` writes sysctl drop-in, idempotent apply
 **TDD Expectations**:
@@ -27,7 +27,7 @@
 **Dependencies**: T-001
 **Files affected**: `crates/vallumix-controls/src/network/common.rs`
 
-### T-003 — test-coverage
+### [x] T-003 — test-coverage
 **Capability**: test-coverage
 **Description**: Create `auth/common.rs` shared test helpers — `AuthContext` struct for PAM config testing, helper to create temp pwquality.conf
 **TDD Expectations**:
@@ -36,7 +36,7 @@
 **Dependencies**: T-001
 **Files affected**: `crates/vallumix-controls/src/auth/common.rs`
 
-### T-004 — test-coverage
+### [x] T-004 — test-coverage
 **Capability**: test-coverage
 **Description**: Create `logging/common.rs` shared test helpers — `LoggingContext` struct for rsyslog/journald/auditd config testing
 **TDD Expectations**:
@@ -45,7 +45,7 @@
 **Dependencies**: T-001
 **Files affected**: `crates/vallumix-controls/src/logging/common.rs`
 
-### T-005 — test-coverage
+### [x] T-005 — test-coverage
 **Capability**: test-coverage
 **Description**: Create `maintenance/common.rs` shared test helpers — `PermsContext` struct, `with_passwd_shadow()` fixture helper, file permission test utilities
 **TDD Expectations**:
@@ -54,7 +54,7 @@
 **Dependencies**: T-001
 **Files affected**: `crates/vallumix-controls/src/maintenance/common.rs`
 
-### T-006 — test-coverage
+### [x] T-006 — test-coverage
 **Capability**: test-coverage
 **Description**: Create `ssh/common.rs` unit tests — test `SshConfig` parse helper, `check_sshd_config()` function with fixture sshd_config content
 **TDD Expectations**:
@@ -67,7 +67,7 @@
 
 ## Phase 2: Controls Tests — Auth Module (CIS 5.1, 5.3–5.5)
 
-### T-007 — controls-auth
+### [x] T-007 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureCronDaemon` (5.1.1) — check when systemd unit exists/inactive, apply creates cron daemon enable
 **TDD Expectations**:
@@ -77,7 +77,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_cron_daemon.rs`
 
-### T-008 — controls-auth
+### [x] T-008 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePamPasswordQuality` (5.3.1) — check when pam_pwquality.so present/absent, apply adds module to system-auth
 **TDD Expectations**:
@@ -86,7 +86,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_pam_password_quality.rs`
 
-### T-009 — controls-auth
+### [x] T-009 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePamMinlen` (5.3.2) — check pwquality.conf minlen ≥ 14, apply updates /etc/security/pwquality.conf
 **TDD Expectations**:
@@ -96,7 +96,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_pam_minlen.rs`
 
-### T-010 — controls-auth
+### [x] T-010 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePamCredit` (5.3.x) — check dcredit/ucredit/ocredit/lcredit all = -1 in pwquality.conf
 **TDD Expectations**:
@@ -106,7 +106,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_pam_credit.rs`
 
-### T-011 — controls-auth
+### [x] T-011 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePamFaillock` (5.3.4) — check pam_faillock.so entries with deny=5 unlock_time=900
 **TDD Expectations**:
@@ -115,7 +115,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_pam_faillock.rs`
 
-### T-012 — controls-auth
+### [x] T-012 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePamRemember` (5.3.5) — check remember≥5 in pam_unix.so, apply updates
 **TDD Expectations**:
@@ -124,7 +124,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_pam_remember.rs`
 
-### T-013 — controls-auth
+### [x] T-013 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePasswordHashing` (5.4.1) — check ENCRYPT_METHOD SHA512/yescrypt in /etc/login.defs
 **TDD Expectations**:
@@ -133,7 +133,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_password_hashing.rs`
 
-### T-014 — controls-auth
+### [x] T-014 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureUmask` (5.5.1) — check umask 0077 in /etc/profile and /etc/bashrc
 **TDD Expectations**:
@@ -142,7 +142,7 @@
 **Dependencies**: T-003
 **Files affected**: `crates/vallumix-controls/src/auth/ensure_umask.rs`
 
-### T-015 — controls-auth
+### [x] T-015 — controls-auth
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureShellTimeout` (5.5.2) — check TMOUT=300 in /etc/profile, apply sets TMOUT
 **TDD Expectations**:
@@ -156,7 +156,7 @@
 
 ## Phase 3: Controls Tests — Logging Module (CIS 4.1)
 
-### T-016 — controls-logging
+### [x] T-016 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureRsyslogInstalled` (4.1.1.1) — check binary /usr/sbin/rsyslogd exists
 **TDD Expectations**:
@@ -165,7 +165,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_rsyslog_installed.rs`
 
-### T-017 — controls-logging
+### [x] T-017 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureRsyslogConfigured` (4.1.1.2) — check auth,authpriv.* directive in rsyslog.conf
 **TDD Expectations**:
@@ -174,7 +174,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_rsyslog_configured.rs`
 
-### T-018 — controls-logging
+### [x] T-018 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureRsyslogPerms` (4.1.1.3) — check /var/log permissions mode 0640, owner root
 **TDD Expectations**:
@@ -183,7 +183,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_rsyslog_perms.rs`
 
-### T-019 — controls-logging
+### [x] T-019 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureJournaldConfigured` (4.1.2.1) — check Storage=persistent in journald.conf
 **TDD Expectations**:
@@ -192,7 +192,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_journald_configured.rs`
 
-### T-020 — controls-logging
+### [x] T-020 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureJournaldOverride` (4.1.2.2) — check drop-in /etc/systemd/journald.conf.d/ exists with override
 **TDD Expectations**:
@@ -201,7 +201,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_journald_override.rs`
 
-### T-021 — controls-logging
+### [x] T-021 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureAuditdInstalled` (4.1.3.1) — check auditd binary /sbin/auditd exists
 **TDD Expectations**:
@@ -210,7 +210,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_auditd_installed.rs`
 
-### T-022 — controls-logging
+### [x] T-022 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureAuditdConfigured` (4.1.3.2) — check max_log_file action = keep_logs in auditd.conf
 **TDD Expectations**:
@@ -219,7 +219,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_auditd_configured.rs`
 
-### T-023 — controls-logging
+### [x] T-023 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureAuditIdentityRules` (4.1.4.1) — check -w /etc/passwd -p wa exists in audit rules
 **TDD Expectations**:
@@ -228,7 +228,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_audit_identity_rules.rs`
 
-### T-024 — controls-logging
+### [x] T-024 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureAuditLoginEvents` (4.1.4.2) — check session rules in audit rules
 **TDD Expectations**:
@@ -237,7 +237,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_audit_login_events.rs`
 
-### T-025 — controls-logging
+### [x] T-025 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureAuditSessionEvents` (4.1.4.3) — check user session events rules
 **TDD Expectations**:
@@ -245,7 +245,7 @@
 **Dependencies**: T-004
 **Files affected**: `crates/vallumix-controls/src/logging/ensure_audit_session_events.rs`
 
-### T-026 — controls-logging
+### [x] T-026 — controls-logging
 **Capability**: test-coverage
 **Description**: Add tests for `EnsureLogrotate` (4.1.7) — check /etc/logrotate.d/rsyslog with weekly rotation
 **TDD Expectations**:
@@ -258,7 +258,7 @@
 
 ## Phase 4: Controls Tests — Network & Maintenance Modules
 
-### T-027 — controls-network
+### [x] T-027 — controls-network
 **Capability**: test-coverage
 **Description**: Add tests for `SysctlDisableSendRedirects` (3.1.2) using SysctlControl common — check all+default send_redirects==0
 **TDD Expectations**:
@@ -268,7 +268,7 @@
 **Dependencies**: T-002
 **Files affected**: `crates/vallumix-controls/src/network/sysctl_disable_send_redirects.rs`
 
-### T-028 — controls-network
+### [x] T-028 — controls-network
 **Capability**: test-coverage
 **Description**: Add tests for `SysctlDisableSourceRoute` (3.2.1) and `SysctlDisableAcceptRedirects` (3.2.2)
 **TDD Expectations**:
@@ -277,7 +277,7 @@
 **Dependencies**: T-002
 **Files affected**: `crates/vallumix-controls/src/network/sysctl_disable_source_route.rs`, `crates/vallumix-controls/src/network/sysctl_disable_accept_redirects.rs`
 
-### T-029 — controls-network
+### [x] T-029 — controls-network
 **Capability**: test-coverage
 **Description**: Add tests for `SysctlEnableRpFilter` (3.2.6) and `SysctlEnableSyncookies` (3.2.7)
 **TDD Expectations**:
@@ -286,7 +286,7 @@
 **Dependencies**: T-002
 **Files affected**: `crates/vallumix-controls/src/network/sysctl_enable_rp_filter.rs`, `crates/vallumix-controls/src/network/sysctl_enable_syncookies.rs`
 
-### T-030 — controls-maintenance
+### [x] T-030 — controls-maintenance
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePermsShadow` (6.1.2) and `EnsurePermsGroup` (6.1.3) — mode 0600 and 0644
 **TDD Expectations**:
@@ -295,7 +295,7 @@
 **Dependencies**: T-005
 **Files affected**: `crates/vallumix-controls/src/maintenance/ensure_perms_shadow.rs`, `crates/vallumix-controls/src/maintenance/ensure_perms_group.rs`
 
-### T-031 — controls-maintenance
+### [x] T-031 — controls-maintenance
 **Capability**: test-coverage
 **Description**: Add tests for `EnsurePermsGshadow` (6.1.4) — mode 0600, owner root
 **TDD Expectations**:
@@ -304,7 +304,7 @@
 **Dependencies**: T-005
 **Files affected**: `crates/vallumix-controls/src/maintenance/ensure_perms_gshadow.rs`
 
-### T-032 — controls-maintenance
+### [x] T-032 — controls-maintenance
 **Capability**: test-coverage
 **Description**: Add tests for `AuditWorldWritable` (6.1.5) and `AuditSuidSgid` (6.1.6) — audit-only controls returning Skipped
 **TDD Expectations**:
@@ -313,7 +313,7 @@
 **Dependencies**: T-005
 **Files affected**: `crates/vallumix-controls/src/maintenance/audit_world_writable.rs`, `crates/vallumix-controls/src/maintenance/audit_suid_sgid.rs`
 
-### T-033 — controls-maintenance
+### [x] T-033 — controls-maintenance
 **Capability**: test-coverage
 **Description**: Add tests for `AuditUnownedFiles` (6.1.7), `AuditDuplicateIds` (6.1.8), `EnsureCronPerms` (6.1.9)
 **TDD Expectations**:
@@ -327,7 +327,7 @@
 
 ## Phase 5: Insta Snapshots — Reporter Output Verification
 
-### T-034 — insta-snapshots
+### [x] T-034 — insta-snapshots
 **Capability**: insta-snapshots
 **Description**: Generate TextReporter insta snapshot — run `cargo insta test --accept` for text_reporter_snapshot test
 **TDD Expectations**:
@@ -336,7 +336,7 @@
 **Dependencies**: None (reporter already has test)
 **Files affected**: `crates/vallumix-reporters/src/text.rs` (snapshots/ dir created)
 
-### T-035 — insta-snapshots
+### [x] T-035 — insta-snapshots
 **Capability**: insta-snapshots
 **Description**: Generate JsonReporter insta snapshot — run `cargo insta test --accept` for json_reporter_snapshot test
 **TDD Expectations**:
@@ -345,7 +345,7 @@
 **Dependencies**: None
 **Files affected**: `crates/vallumix-reporters/src/json.rs` (snapshots/ dir)
 
-### T-036 — insta-snapshots
+### [x] T-036 — insta-snapshots
 **Capability**: insta-snapshots
 **Description**: Generate HtmlReporter insta snapshot — run `cargo insta test --accept` for html_reporter_snapshot test
 **TDD Expectations**:
@@ -354,7 +354,7 @@
 **Dependencies**: None
 **Files affected**: `crates/vallumix-reporters/src/html.rs` (snapshots/ dir)
 
-### T-037 — insta-snapshots
+### [x] T-037 — insta-snapshots
 **Capability**: insta-snapshots
 **Description**: Generate JunitReporter insta snapshot — run `cargo insta test --accept` for junit_reporter_snapshot test
 **TDD Expectations**:
@@ -367,7 +367,7 @@
 
 ## Phase 6: CLI Integration Tests — assert_cmd Expansion
 
-### T-038 — cli-integration
+### [x] T-038 — cli-integration
 **Capability**: test-coverage
 **Description**: Add `cli_audit_html_report` test — `audit --report html` produces valid HTML with DOCTYPE and control elements
 **TDD Expectations**:
@@ -376,7 +376,7 @@
 **Dependencies**: T-036
 **Files affected**: `crates/vallumix-cli/tests/cli.rs`
 
-### T-039 — cli-integration
+### [x] T-039 — cli-integration
 **Capability**: test-coverage
 **Description**: Add `cli_audit_junit_report` test — `audit --report junit` produces valid XML with testsuite element
 **TDD Expectations**:
@@ -385,7 +385,7 @@
 **Dependencies**: T-037
 **Files affected**: `crates/vallumix-cli/tests/cli.rs`
 
-### T-040 — cli-integration
+### [x] T-040 — cli-integration
 **Capability**: test-coverage
 **Description**: Add `cli_audit_text_report` test — `audit --report text` produces formatted text with ✓/✗ icons
 **TDD Expectations**:
@@ -394,7 +394,7 @@
 **Dependencies**: T-034
 **Files affected**: `crates/vallumix-cli/tests/cli.rs`
 
-### T-041 — cli-integration
+### [x] T-041 — cli-integration
 **Capability**: test-coverage
 **Description**: Add `cli_audit_multi_report` test — `audit --report html,json` produces both files (or output to stdout)
 **TDD Expectations**:
@@ -403,7 +403,7 @@
 **Dependencies**: T-038, T-039
 **Files affected**: `crates/vallumix-cli/tests/cli.rs`
 
-### T-042 — cli-integration
+### [x] T-042 — cli-integration
 **Capability**: test-coverage
 **Description**: Add `cli_audit_output_file` test — `audit --output /tmp/vallumix-report.html` writes file to disk
 **TDD Expectations**:
@@ -412,7 +412,7 @@
 **Dependencies**: T-038
 **Files affected**: `crates/vallumix-cli/tests/cli.rs`
 
-### T-043 — cli-integration
+### [x] T-043 — cli-integration
 **Capability**: test-coverage
 **Description**: Add `cli_rollback_no_session` test — `rollback --control-id X.XX.X` when no backup exists returns exit code 2
 **TDD Expectations**:
@@ -425,7 +425,7 @@
 
 ## Phase 7: CI Workflow Expansion
 
-### T-044 — ci-expansion
+### [x] T-044 — ci-expansion
 **Capability**: ci-expansion
 **Description**: Add aarch64 cross-build job to CI — install cross, add `aarch64-unknown-linux-gnu` target, build-only job (no test execution on aarch64)
 **TDD Expectations**:
@@ -434,7 +434,7 @@
 **Dependencies**: None
 **Files affected**: `.github/workflows/ci.yml`
 
-### T-045 — ci-expansion
+### [x] T-045 — ci-expansion
 **Capability**: ci-expansion
 **Description**: Add cargo-tarpaulin to CI — install tarpaulin, run `cargo tarpaulin --workspace --out Html --out Lcov`, upload coverage
 **TDD Expectations**:
@@ -443,7 +443,7 @@
 **Dependencies**: T-044
 **Files affected**: `.github/workflows/ci.yml`, `.tarpaulin.toml`
 
-### T-046 — ci-expansion
+### [x] T-046 — ci-expansion
 **Capability**: ci-expansion
 **Description**: Add cargo-deny to CI — run `cargo deny check` in CI, verify deny.toml configuration
 **TDD Expectations**:
@@ -452,7 +452,7 @@
 **Dependencies**: None
 **Files affected**: `.github/workflows/ci.yml`
 
-### T-047 — ci-expansion
+### [x] T-047 — ci-expansion
 **Capability**: ci-expansion
 **Description**: Add cargo-audit to CI — run `cargo audit` after dependency resolution, fail on vulnerabilities
 **TDD Expectations**:
@@ -461,7 +461,7 @@
 **Dependencies**: None
 **Files affected**: `.github/workflows/ci.yml`
 
-### T-048 — ci-expansion
+### [x] T-048 — ci-expansion
 **Capability**: ci-expansion
 **Description**: Add insta snapshot CI check — run `cargo insta test --require-snapshots` in CI to fail on new snapshots
 **TDD Expectations**:
@@ -474,7 +474,7 @@
 
 ## Phase 8: Vagrant Fixtures
 
-### T-049 — vagrant-fixtures
+### [x] T-049 — vagrant-fixtures
 **Capability**: vagrant-fixtures
 **Description**: Create `Vagrantfile` with base config — define 4 VMs (debian12, ubuntu2204, ubuntu2404, rockylinux9), synced folder, memory 2GB
 **TDD Expectations**:
@@ -483,7 +483,7 @@
 **Dependencies**: None
 **Files affected**: `Vagrantfile` (project root)
 
-### T-050 — vagrant-fixtures
+### [x] T-050 — vagrant-fixtures
 **Capability**: vagrant-fixtures
 **Description**: Create `scripts/provision-debian.sh` — install Rust toolchain, build vallumix, run `vallumix audit --profile web`
 **TDD Expectations**:
@@ -492,7 +492,7 @@
 **Dependencies**: T-049
 **Files affected**: `scripts/provision-debian.sh`
 
-### T-051 — vagrant-fixtures
+### [x] T-051 — vagrant-fixtures
 **Capability**: vagrant-fixtures
 **Description**: Create `scripts/provision-ubuntu.sh` — same as debian but for Ubuntu (use apt-get)
 **TDD Expectations**:
@@ -501,7 +501,7 @@
 **Dependencies**: T-049
 **Files affected**: `scripts/provision-ubuntu.sh`
 
-### T-052 — vagrant-fixtures
+### [x] T-052 — vagrant-fixtures
 **Capability**: vagrant-fixtures
 **Description**: Create `scripts/provision-rocky.sh` — use dnf for Rocky Linux 9, install Rust via rustup
 **TDD Expectations**:
@@ -514,7 +514,7 @@
 
 ## Phase 9: Verification
 
-### T-053 — verification
+### [x] T-053 — verification
 **Capability**: test-coverage
 **Description**: Run `cargo test --workspace` — verify all 200+ tests pass including new controls tests
 **TDD Expectations**:
@@ -523,7 +523,7 @@
 **Dependencies**: T-001 through T-043
 **Files affected**: All crates — workspace-wide test run
 
-### T-054 — verification
+### [x] T-054 — verification
 **Capability**: ci-expansion
 **Description**: Verify coverage threshold — ensure tarpaulin shows ≥80% coverage across all crates
 **TDD Expectations**:

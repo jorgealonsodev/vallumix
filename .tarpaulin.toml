@@ -1,0 +1,14 @@
+[engine]
+engine = "Llvm"
+
+[output]
+out = ["Html", "Lcov"]
+
+[exclude]
+exclude-files = ["**/main.rs"]
+
+[timeout]
+timeout = "300s"
+
+[fail-under]
+percentage = 70

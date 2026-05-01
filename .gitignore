@@ -10,3 +10,4 @@ Cargo.lock
 .atl/
 .windsurf/
 img/
+man/*.1

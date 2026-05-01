@@ -6,6 +6,8 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+description = "Report generators for Vallumix CIS hardening toolkit"
+publish = false
 
 [dependencies]
 vallumix-core = { workspace = true }
@@ -13,6 +15,11 @@ serde_json = { workspace = true }
 askama = { workspace = true }
 quick-xml = { workspace = true }
 owo-colors = { workspace = true, features = ["supports-colors"] }
+chrono = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dev-dependencies]
 insta = { workspace = true }

@@ -1,0 +1,91 @@
+name: New CIS Control
+
+description: Propose a new CIS Benchmark control for Vallumix.
+
+title: "[CONTROL] "
+
+labels: ["enhancement", "cis-control"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a new CIS control! Please fill out the fields below so we can evaluate and implement it correctly.
+
+  - type: input
+    id: control_id
+    attributes:
+      label: CIS Control ID
+      description: The official CIS Benchmark identifier (e.g., 5.2.4).
+      placeholder: "5.2.4"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How critical is this control?
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: distros
+    attributes:
+      label: Applicable Distributions
+      description: Which Linux distributions should this control target?
+      options:
+        - label: Debian 12
+        - label: Ubuntu 22.04
+        - label: Ubuntu 24.04
+        - label: RHEL 9
+        - label: Rocky Linux 9
+        - label: AlmaLinux 9
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: profiles
+    attributes:
+      label: Applicable Profiles
+      description: Which built-in profiles should include this control?
+      options:
+        - label: web
+        - label: database
+        - label: bastion
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Control Description
+      description: A clear description of what this control checks and enforces.
+      placeholder: "Ensure SSH Protocol is set to 2 ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Security Justification
+      description: Why should this control be included? What risk does it mitigate?
+    validations:
+      required: true
+
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Proposed Remediation
+      description: Describe how the control would be applied (files modified, commands run, etc.).
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Link to the relevant CIS Benchmark section, NIST 800-53 mapping, or other standards.

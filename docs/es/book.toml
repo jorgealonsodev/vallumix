@@ -1,0 +1,29 @@
+[book]
+title = "Vallumix"
+authors = ["Jorge Alonso <jorge@vallumix.dev>"]
+language = "es"
+src = "src"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/jorgealonsodev/vallumix"
+edit-url-template = "https://github.com/jorgealonsodev/vallumix/edit/main/docs/es/src/{path}"
+site-url = "/vallumix/"
+
+[output.html.search]
+enable = true
+limit-results = 30
+
+[output.html.fold]
+enable = true
+level = 1
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[preprocessor.admonish]
+command = "mdbook-admonish"
+
+[output.linkcheck]
+follow-web-links = false

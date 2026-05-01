@@ -6,6 +6,8 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+description = "Core traits and types for Vallumix CIS hardening toolkit"
+publish = false
 
 [dependencies]
 thiserror = { workspace = true }
@@ -14,6 +16,10 @@ tracing = { workspace = true }
 chrono = { workspace = true }
 toml = { workspace = true }
 nix = { workspace = true, features = ["hostname"] }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dev-dependencies]
 tempfile = { workspace = true }

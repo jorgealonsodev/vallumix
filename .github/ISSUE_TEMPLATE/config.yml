@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Advisory
+    url: https://github.com/jorgealonsodev/vallumix/security/advisories/new
+    about: Report a security vulnerability privately via GitHub Security Advisories.
+  - name: Ask a Question
+    url: https://github.com/jorgealonsodev/vallumix/discussions
+    about: Please use GitHub Discussions for questions and general help.
+  - name: Read the Docs
+    url: https://jorgealonsodev.github.io/vallumix/
+    about: Check the documentation before opening an issue.

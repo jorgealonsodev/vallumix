@@ -1,0 +1,44 @@
+---
+source: crates/vallumix-reporters/src/json.rs
+assertion_line: 132
+expression: output
+---
+{
+  "host": {
+    "hostname": "snaphost",
+    "distro": "debian/12"
+  },
+  "summary": {
+    "total": 3,
+    "pass": 1,
+    "fail": 1,
+    "skip": 1,
+    "compliance_rate": 33.33
+  },
+  "controls": [
+    {
+      "id": "1.1.1.1",
+      "description": "Disable cramfs",
+      "severity": "Low",
+      "status": "Compliant",
+      "evidence": "not present",
+      "message": null
+    },
+    {
+      "id": "5.2.4",
+      "description": "Disable root login",
+      "severity": "High",
+      "status": "NonCompliant",
+      "evidence": "PermitRootLogin yes",
+      "message": "should be no"
+    },
+    {
+      "id": "3.1.1",
+      "description": "Disable IP forwarding",
+      "severity": "Medium",
+      "status": "Skipped",
+      "evidence": "dry-run",
+      "message": null
+    }
+  ]
+}

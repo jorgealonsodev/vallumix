@@ -133,7 +133,9 @@ impl BackupManager {
             session.control_ids.push(control_id.into());
         }
         fs::create_dir_all(path.parent().unwrap())?;
-        fs::write(&path, serde_json::to_string_pretty(&session)?)?;
+        let content = serde_json::to_string_pretty(&session)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        fs::write(&path, content)?;
         Ok(())
     }
 

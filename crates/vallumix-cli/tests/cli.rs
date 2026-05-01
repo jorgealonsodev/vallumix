@@ -89,3 +89,130 @@ fn cli_audit_exit_code_fails_below_threshold() {
     // Exit code 1 when compliance is below threshold
     cmd.assert().failure().code(1);
 }
+
+#[test]
+fn cli_audit_html_report() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("html")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("<!DOCTYPE html>"))
+        .stdout(predicate::str::contains("<html"));
+}
+
+#[test]
+fn cli_audit_junit_report() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("junit")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("<?xml"))
+        .stdout(predicate::str::contains("<testsuite"));
+}
+
+#[test]
+fn cli_audit_text_report() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("text")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Compliant"))
+        .stdout(predicate::str::contains("Non-Compliant"));
+}
+
+#[test]
+fn cli_audit_multi_report() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("html,json")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("<!DOCTYPE html>"))
+        .stdout(predicate::str::contains("\"host\""));
+}
+
+#[test]
+fn cli_audit_output_file() {
+    let tmpdir = tempfile::tempdir().unwrap();
+    let output_path = tmpdir.path().join("vallumix-report.html");
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("html")
+        .arg("--output")
+        .arg(&output_path)
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert().success();
+    assert!(output_path.exists(), "output file should exist");
+    let content = std::fs::read_to_string(&output_path).unwrap();
+    assert!(content.contains("<!DOCTYPE html>"));
+}
+
+#[test]
+fn cli_rollback_no_session() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("rollback")
+        .arg("--control-id")
+        .arg("9.9.9.9");
+    // No backup exists for this control → exit code 2
+    cmd.assert().failure().code(2);
+}
+
+#[test]
+fn cli_completion_zsh() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("completion").arg("zsh");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("vallumix"));
+}
+
+#[test]
+fn cli_completion_fish() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("completion").arg("fish");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("vallumix"));
+}
+
+#[test]
+fn cli_completion_nushell() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("completion").arg("nushell");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("vallumix"))
+        .stdout(predicate::str::contains("not yet supported").not());
+}

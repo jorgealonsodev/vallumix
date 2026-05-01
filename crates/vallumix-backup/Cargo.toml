@@ -6,12 +6,19 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+description = "Backup and rollback system for Vallumix CIS hardening toolkit"
+publish = false
 
 [dependencies]
 vallumix-core = { workspace = true }
 chrono = { workspace = true }
 sha2 = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dev-dependencies]
 tempfile = { workspace = true }

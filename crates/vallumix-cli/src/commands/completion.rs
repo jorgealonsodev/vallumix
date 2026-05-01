@@ -1,21 +1,10 @@
 use anyhow::Result;
 use clap::CommandFactory;
-use clap_complete::{generate, Shell as ClapShell};
-
-use crate::Shell;
+use clap_complete::{generate, Shell};
 
 pub fn run(shell: Shell) -> Result<i32> {
-    let mut cmd = crate::Cli::command();
-    match shell {
-        Shell::Bash => generate(ClapShell::Bash, &mut cmd, "vallumix", &mut std::io::stdout()),
-        Shell::Zsh => generate(ClapShell::Zsh, &mut cmd, "vallumix", &mut std::io::stdout()),
-        Shell::Fish => generate(ClapShell::Fish, &mut cmd, "vallumix", &mut std::io::stdout()),
-        Shell::Nushell => {
-            println!("# Nushell completion for vallumix");
-            println!("# (not yet supported by clap_complete)");
-            return Ok(0);
-        }
-    }
+    let mut cmd = crate::cli::Cli::command();
+    generate(shell, &mut cmd, "vallumix", &mut std::io::stdout());
     Ok(0)
 }
 

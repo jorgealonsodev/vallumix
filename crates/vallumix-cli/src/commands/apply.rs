@@ -139,7 +139,7 @@ pub fn run(
                 "text" => TextReporter::new().generate(&report)?,
                 _ => continue,
             };
-            if let Some(output_dir) = output {
+            if let Some(output_path) = output {
                 let ext = match fmt.as_str() {
                     "json" => "json",
                     "html" => "html",
@@ -147,8 +147,15 @@ pub fn run(
                     "text" => "txt",
                     _ => "txt",
                 };
-                let path = output_dir.join(format!("vallumix-report.{}", ext));
-                std::fs::create_dir_all(output_dir)?;
+                let path = if output_path.extension().and_then(|e| e.to_str()) == Some(ext) {
+                    output_path.to_path_buf()
+                } else {
+                    std::fs::create_dir_all(output_path)?;
+                    output_path.join(format!("vallumix-report.{}", ext))
+                };
+                if let Some(parent) = path.parent() {
+                    std::fs::create_dir_all(parent)?;
+                }
                 std::fs::write(&path, content)?;
                 if !quiet {
                     println!("Report written to {}", path.display());

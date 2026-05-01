@@ -1,0 +1,19 @@
+---
+source: crates/vallumix-reporters/src/text.rs
+assertion_line: 207
+expression: output
+---
+Vallumix Compliance Report — srv01 (rocky/9)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total:   3   Pass:   1   Fail:   1   Skip:   1
+  Compliance Rate: 33.3%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[LOW] OK 1.1.1.1 — Disable cramfs
+      → not present
+[HIGH] FAIL 5.2.4 — Disable root login
+      → PermitRootLogin yes
+[MED] SKIP 3.1.1 — Disable IP forwarding
+      → dry-run
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
