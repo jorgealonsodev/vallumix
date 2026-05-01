@@ -3,7 +3,7 @@ targets = []
 
 [licenses]
 version = 2
-allow = ["MIT", "Apache-2.0"]
+allow = ["MIT", "Apache-2.0", "ISC", "Unicode-3.0"]
 confidence-threshold = 0.8
 
 [advisories]

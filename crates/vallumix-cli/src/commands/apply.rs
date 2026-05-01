@@ -6,7 +6,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use vallumix_core::control::{ApplyStatus, CheckStatus, Control};
 use vallumix_core::context::Context;
 use vallumix_core::distro::Distro;
-use vallumix_core::profile::{ControlReport, Profile};
+use vallumix_core::profile::{ControlReport, Profile, Reporter};
 use vallumix_reporters::{build_report, HtmlReporter, JsonReporter, JunitReporter, TextReporter};
 
 pub fn run(

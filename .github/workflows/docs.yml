@@ -69,9 +69,9 @@ jobs:
 
       - name: Assemble site
         run: |
-          mkdir -p site/en site/es
-          cp -r docs/es/book/* site/
-          cp -r docs/en/book/* site/en/
+          mkdir -p site/en
+          cp -r docs/es/book/html/* site/
+          cp -r docs/en/book/html/* site/en/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

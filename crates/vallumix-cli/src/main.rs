@@ -3,7 +3,7 @@
 mod cli;
 mod commands;
 
-use cli::{Cli, Commands, ReportFormat};
+use cli::{Cli, Commands};
 use clap::Parser;
 use owo_colors::OwoColorize;
 
@@ -58,7 +58,7 @@ fn main() {
                 cli.dry_run,
                 cli.threshold,
                 report_formats.clone(),
-                cli.output.as_ref(),
+                cli.output.as_ref().map(|p| p.as_path()),
                 cli.quiet,
             ) {
                 Ok(code) => code,
@@ -69,7 +69,7 @@ fn main() {
             &cli.profile,
             cli.threshold,
             report_formats.clone(),
-            cli.output.as_ref(),
+            cli.output.as_ref().map(|p| p.as_path()),
             cli.quiet,
         ) {
             Ok(code) => code,
