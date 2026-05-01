@@ -16,11 +16,8 @@ fn main() {
     fs::write(&man_path, buffer).expect("Failed to write man page");
 
     // Copy to project root man/ directory for packaging
-    let project_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap();
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let project_root = manifest_dir.parent().unwrap().parent().unwrap().to_path_buf();
     let target_dir = project_root.join("man");
     fs::create_dir_all(&target_dir).ok();
     fs::copy(&man_path, target_dir.join("vallumix.1")).ok();
