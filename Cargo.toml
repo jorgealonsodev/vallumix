@@ -37,7 +37,7 @@ anyhow = "1.0"
 tempfile = "3.10"
 chrono = { version = "0.4", features = ["serde"] }
 sha2 = "0.10"
-askama = "0.12"
+askama = "0.16"
 quick-xml = "0.36"
 indicatif = "0.17"
 clap_complete = "4.5"
