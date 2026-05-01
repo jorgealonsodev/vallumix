@@ -38,7 +38,11 @@ rustdoc-args = ["--cfg", "docsrs"]
 [dev-dependencies]
 assert_cmd = { workspace = true }
 predicates = { workspace = true }
+
+[build-dependencies]
+clap = { workspace = true }
 clap_mangen = { workspace = true }
+clap_complete = { workspace = true }
 
 [package.metadata.deb]
 maintainer = "Vallumix Contributors <vallumix@example.com>"
