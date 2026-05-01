@@ -29,11 +29,11 @@ jobs:
       - name: Install dependencies
         run: |
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update && apt-get install -y curl ca-certificates
+            apt-get update && apt-get install -y curl ca-certificates build-essential pkg-config
           elif command -v dnf >/dev/null 2>&1; then
-            dnf install -y curl ca-certificates
+            dnf install -y curl ca-certificates gcc gcc-c++ make pkgconfig
           elif command -v yum >/dev/null 2>&1; then
-            yum install -y curl ca-certificates
+            yum install -y curl ca-certificates gcc gcc-c++ make pkgconfig
           fi
 
       - name: Install Rust toolchain
