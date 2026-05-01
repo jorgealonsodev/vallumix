@@ -25,7 +25,7 @@ This is not the intended use case. CIS controls are designed for complete operat
 Download the new version from the release and install it over the previous one. Backups in `/var/backups/vallumix` are preserved. After updating, run `vallumix --version` to confirm.
 
 ```bash
-wget https://github.com/tu-org/vallumix/releases/download/v1.1.0/vallumix_1.1.0_amd64.deb
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.1.0/vallumix_1.1.0_amd64.deb
 sudo dpkg -i vallumix_1.1.0_amd64.deb
 ```
 

@@ -16,7 +16,7 @@ In your Packer template (for example, `base-image.pkr.hcl`), add a `shell` provi
 ```hcl
 provisioner "shell" {
   inline = [
-    "wget -q https://github.com/tu-org/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb",
+    "wget -q https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb",
     "dpkg -i vallumix_1.0.0_amd64.deb",
     "vallumix apply --profile web --threshold 95 --report junit --output /tmp/vallumix-results.xml",
   ]

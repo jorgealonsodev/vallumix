@@ -28,7 +28,7 @@ ss -tlnp | grep :443
 ## Step 2: Install Vallumix
 
 ```bash
-wget https://github.com/tu-org/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb
 sudo dpkg -i vallumix_1.0.0_amd64.deb
 vallumix --version
 # Expected output: vallumix 1.0.0

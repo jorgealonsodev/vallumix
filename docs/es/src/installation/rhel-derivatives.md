@@ -15,10 +15,10 @@ Esta guía cubre la instalación de Vallumix en Red Hat Enterprise Linux 9, Rock
 
 ```bash
 # Para x86_64
-wget https://github.com/tu-org/vallumix/releases/download/v1.0.0/vallumix-1.0.0-1.x86_64.rpm
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix-1.0.0-1.x86_64.rpm
 
 # Para aarch64
-wget https://github.com/tu-org/vallumix/releases/download/v1.0.0/vallumix-1.0.0-1.aarch64.rpm
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix-1.0.0-1.aarch64.rpm
 ```
 
 ### 2. Instala con dnf

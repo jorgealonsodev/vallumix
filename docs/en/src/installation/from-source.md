@@ -18,7 +18,7 @@ Vallumix requires no system dependencies at runtime, but needs a complete Rust t
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/tu-org/vallumix.git
+git clone https://github.com/jorgealonsodev/vallumix.git
 cd vallumix
 ```
 

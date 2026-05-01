@@ -6,7 +6,7 @@
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/vallumix/vallumix.git
+   git clone https://github.com/jorgealonsodev/vallumix.git
    cd vallumix
    ```
 

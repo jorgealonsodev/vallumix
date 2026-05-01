@@ -17,10 +17,10 @@ Visit the releases page of the repository and download the `.deb` file correspon
 
 ```bash
 # For amd64
-wget https://github.com/tu-org/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb
 
 # For arm64
-wget https://github.com/tu-org/vallumix/releases/download/v1.0.0/vallumix_1.0.0_arm64.deb
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix_1.0.0_arm64.deb
 ```
 
 ### 2. Install with dpkg

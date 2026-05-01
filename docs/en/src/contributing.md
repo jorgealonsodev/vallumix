@@ -6,7 +6,7 @@ Thank you for your interest in contributing to Vallumix! This document provides 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/vallumix/vallumix.git
+   git clone https://github.com/jorgealonsodev/vallumix.git
    cd vallumix
    ```
 

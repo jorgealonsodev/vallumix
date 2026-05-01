@@ -18,7 +18,7 @@ Vallumix no requiere dependencias de sistema en runtime, pero necesita un toolch
 ### 1. Clona el repositorio
 
 ```bash
-git clone https://github.com/tu-org/vallumix.git
+git clone https://github.com/jorgealonsodev/vallumix.git
 cd vallumix
 ```
 

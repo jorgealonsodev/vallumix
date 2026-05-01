@@ -17,7 +17,7 @@ This will download, compile, and install the `vallumix` binary into your cargo b
 To build from source, you need Rust 1.75 or later:
 
 ```bash
-git clone https://github.com/vallumix/vallumix.git
+git clone https://github.com/jorgealonsodev/vallumix.git
 cd vallumix
 cargo build --release -p vallumix-cli
 ```
@@ -26,19 +26,19 @@ The compiled binary will be available at `target/release/vallumix`.
 
 ## Debian / Ubuntu (.deb)
 
-Download the latest `.deb` package from the [GitHub Releases](https://github.com/vallumix/vallumix/releases) page:
+Download the latest `.deb` package from the [GitHub Releases](https://github.com/jorgealonsodev/vallumix/releases) page:
 
 ```bash
-wget https://github.com/vallumix/vallumix/releases/download/v0.0.1/vallumix_0.0.1_amd64.deb
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix_1.0.0_amd64.deb
 sudo dpkg -i vallumix_0.0.1_amd64.deb
 ```
 
 ## RHEL / Rocky / AlmaLinux (.rpm)
 
-Download the latest `.rpm` package from the [GitHub Releases](https://github.com/vallumix/vallumix/releases) page:
+Download the latest `.rpm` package from the [GitHub Releases](https://github.com/jorgealonsodev/vallumix/releases) page:
 
 ```bash
-wget https://github.com/vallumix/vallumix/releases/download/v0.0.1/vallumix-0.0.1-1.x86_64.rpm
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.0.0/vallumix-1.0.0-1.x86_64.rpm
 sudo rpm -i vallumix-0.0.1-1.x86_64.rpm
 ```
 

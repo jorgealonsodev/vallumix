@@ -25,7 +25,7 @@ No es el caso de uso previsto. Los controles CIS están diseñados para sistemas
 Descarga la nueva versión del release e instálala sobre la anterior. Los respaldos en `/var/backups/vallumix` se conservan. Tras actualizar, ejecuta `vallumix --version` para confirmar.
 
 ```bash
-wget https://github.com/tu-org/vallumix/releases/download/v1.1.0/vallumix_1.1.0_amd64.deb
+wget https://github.com/jorgealonsodev/vallumix/releases/download/v1.1.0/vallumix_1.1.0_amd64.deb
 sudo dpkg -i vallumix_1.1.0_amd64.deb
 ```
 
