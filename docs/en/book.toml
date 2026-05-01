@@ -27,3 +27,4 @@ command = "mdbook-admonish"
 
 [output.linkcheck]
 follow-web-links = false
+optional = true
