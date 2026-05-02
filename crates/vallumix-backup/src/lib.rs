@@ -86,6 +86,9 @@ impl BackupManager {
         let backup_path = version_dir.join(&filename);
         fs::copy(original_path, &backup_path)?;
 
+        // Persist original path for reliable rollback/listing later.
+        fs::write(version_dir.join(".original_path"), original_path.to_string_lossy().as_ref())?;
+
         let checksum = self.checksum(&backup_path)?;
         let checksum_path = backup_path.with_extension(format!("{}.sha256", filename));
         fs::write(&checksum_path, &checksum)?;
@@ -164,12 +167,29 @@ impl BackupManager {
                 }
                 let version: usize = name[1..].parse().unwrap_or(0);
                 let version_dir = version_entry.path();
+
+                let original_path_marker = version_dir.join(".original_path");
+                let original_path = if original_path_marker.exists() {
+                    PathBuf::from(fs::read_to_string(&original_path_marker)?.trim())
+                } else {
+                    version_dir.clone()
+                };
+
+                let mut found_backup = false;
+                let mut checksum_only_entries: Vec<(String, PathBuf)> = Vec::new();
+
                 for file_entry in fs::read_dir(&version_dir)? {
                     let file_entry = file_entry?;
                     let fname = file_entry.file_name().to_string_lossy().to_string();
-                    if fname.ends_with(".sha256") {
+                    if fname == ".original_path" {
                         continue;
                     }
+                    if fname.ends_with(".sha256") {
+                        let backup_name = fname.trim_end_matches(".sha256").to_string();
+                        checksum_only_entries.push((backup_name, file_entry.path()));
+                        continue;
+                    }
+                    found_backup = true;
                     let backup_path = file_entry.path();
                     let checksum_path = backup_path.with_extension(format!("{}.sha256", fname));
                     let checksum = if checksum_path.exists() {
@@ -177,15 +197,30 @@ impl BackupManager {
                     } else {
                         None
                     };
-                    let original_path = backup_path.clone(); // best effort; real original stored elsewhere
                     metas.push(BackupMeta {
                         control_id: control_id.clone(),
                         version,
                         timestamp: fs::metadata(&backup_path)?.modified()?.into(),
-                        original_path,
+                        original_path: original_path.clone(),
                         backup_path,
                         checksum,
                     });
+                }
+
+                // Surface versions where backup payload is missing but checksum sidecar remains.
+                if !found_backup {
+                    for (backup_name, checksum_path) in checksum_only_entries {
+                        let backup_path = version_dir.join(&backup_name);
+                        let checksum = Some(fs::read_to_string(&checksum_path)?.trim().to_string());
+                        metas.push(BackupMeta {
+                            control_id: control_id.clone(),
+                            version,
+                            timestamp: fs::metadata(&version_dir)?.modified()?.into(),
+                            original_path: original_path.clone(),
+                            backup_path,
+                            checksum,
+                        });
+                    }
                 }
             }
         }

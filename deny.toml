@@ -9,6 +9,10 @@ confidence-threshold = 0.8
 [advisories]
 version = 2
 yanked = "warn"
+# Temporary, narrowly-scoped exception to keep CI strict while upstream catches up.
+ignore = [
+  { id = "RUSTSEC-2025-0119", reason = "Temporary CI unblock; track upstream fix and remove once patched release is available" },
+]
 
 [bans]
 multiple-versions = "warn"

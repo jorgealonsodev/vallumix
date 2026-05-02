@@ -1,5 +1,6 @@
 ---
 source: crates/vallumix-reporters/src/text.rs
+assertion_line: 207
 expression: output
 ---
 Vallumix Compliance Report — srv01 (rocky/9)

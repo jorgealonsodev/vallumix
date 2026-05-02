@@ -1,5 +1,6 @@
 ---
 source: crates/vallumix-reporters/src/json.rs
+assertion_line: 132
 expression: output
 ---
 {

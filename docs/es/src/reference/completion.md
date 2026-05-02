@@ -15,7 +15,8 @@ vallumix completion <shell>
 | `bash` | `vallumix completion bash` | Redirección a archivo + `source` en `.bashrc` |
 | `zsh` | `vallumix completion zsh` | Redirección a directorio de completions de zsh |
 | `fish` | `vallumix completion fish` | Redirección a directorio de completions de fish |
-| `nushell` | `vallumix completion nushell` | Carga manual en `config.nu` |
+| `powershell` | `vallumix completion powershell` | Carga en el perfil de PowerShell |
+| `elvish` | `vallumix completion elvish` | Evaluación en el rc de Elvish |
 
 ## Bash
 
@@ -62,16 +63,16 @@ vallumix completion fish > ~/.config/fish/completions/vallumix.fish
 
 Fish recarga los completions automáticamente; no necesitas reiniciar la sesión.
 
-## Nushell
+## PowerShell
 
 ```bash
-vallumix completion nushell > ~/.config/nushell/vallumix-completions.nu
+vallumix completion powershell > vallumix.ps1
 ```
 
-Añade al final de `~/.config/nushell/config.nu`:
+Añádelo en tu perfil de PowerShell:
 
-```nu
-source ~/.config/nushell/vallumix-completions.nu
+```powershell
+. ./vallumix.ps1
 ```
 
 ## Verificación

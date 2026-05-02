@@ -1,5 +1,6 @@
 ---
 source: crates/vallumix-reporters/src/html.rs
+assertion_line: 140
 expression: output
 ---
 <!DOCTYPE html>

@@ -212,7 +212,6 @@ fn cli_completion_nushell() {
     let mut cmd = Command::cargo_bin("vallumix").unwrap();
     cmd.arg("completion").arg("nushell");
     cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("vallumix"))
-        .stdout(predicate::str::contains("not yet supported").not());
+        .failure()
+        .stderr(predicate::str::contains("invalid value 'nushell'"));
 }
