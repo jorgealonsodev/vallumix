@@ -96,13 +96,20 @@ jobs:
 
       - name: Generate CycloneDX SBOM
         run: |
-          cargo sbom --output-format cyclonedx-json -p vallumix-cli > vallumix-sbom-1.0.0.cdx.json || true
+          VERSION=${GITHUB_REF_NAME#v}
+          mkdir -p release
+          SBOM_PATH="release/vallumix-sbom-${VERSION}.cdx.json"
+          cargo sbom --output-format cyclonedx-json -p vallumix-cli > "$SBOM_PATH"
+          if [ ! -s "$SBOM_PATH" ]; then
+            echo "ERROR: SBOM was not generated or is empty: $SBOM_PATH"
+            exit 1
+          fi
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
           name: sbom
-          path: vallumix-sbom-*.cdx.json
+          path: release/vallumix-sbom-*.cdx.json
 
   release:
     needs: [build, sbom]
@@ -136,8 +143,15 @@ jobs:
         run: |
           mkdir -p release
           find artifacts -type f -exec cp {} release/ \;
-          cp sbom/*.cdx.json release/ || true
+          VERSION=${GITHUB_REF_NAME#v}
+          SBOM_PATH="sbom/vallumix-sbom-${VERSION}.cdx.json"
+          if [ -s "$SBOM_PATH" ]; then
+            cp "$SBOM_PATH" release/
+          else
+            echo "SBOM missing or empty, skipping SBOM asset: $SBOM_PATH"
+          fi
           cd release
+          find . -maxdepth 1 -type f -name '*.cdx.json' -size 0 -delete
           sha256sum * > SHA256SUMS
 
       - name: Generate artifact hashes for SLSA
