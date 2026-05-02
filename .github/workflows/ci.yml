@@ -191,4 +191,4 @@ jobs:
       - name: Require all snapshots present
         run: |
           cargo install cargo-insta
-          cargo insta test --require-snapshots -p vallumix-reporters
+          cargo insta test --require-full-match -p vallumix-reporters

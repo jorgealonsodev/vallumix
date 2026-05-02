@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 use assert_cmd::prelude::*;
+use nix::unistd;
 use predicates::prelude::*;
 
 fn workspace_root() -> PathBuf {
@@ -19,6 +20,10 @@ fn profile_dir() -> PathBuf {
 
 #[test]
 fn cli_apply_dry_run_requires_root() {
+    if unistd::geteuid().is_root() {
+        eprintln!("skipping: running as root (CI container)");
+        return;
+    }
     let mut cmd = Command::cargo_bin("vallumix").unwrap();
     cmd.arg("apply")
         .arg("--profile")
