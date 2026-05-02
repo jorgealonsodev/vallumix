@@ -2,8 +2,6 @@ use askama::Template;
 use vallumix_core::error::ReportError;
 use vallumix_core::profile::{ControlReport, HostInfo, Report, Summary};
 
-use askama::Template as _;
-
 #[derive(Template)]
 #[template(path = "report.html")]
 struct ReportTemplate {

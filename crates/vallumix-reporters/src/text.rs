@@ -1,6 +1,6 @@
 use std::env;
 
-use owo_colors::{OwoColorize, Stream::Stdout};
+use owo_colors::OwoColorize;
 use vallumix_core::error::ReportError;
 use vallumix_core::profile::Report;
 
@@ -17,14 +17,6 @@ impl TextReporter {
 
     pub fn with_no_color(no_color: bool) -> Self {
         TextReporter { no_color }
-    }
-
-    fn icon(&self, status: &str) -> String {
-        match status {
-            "Compliant" => "✓".to_string(),
-            "NonCompliant" => "✗".to_string(),
-            _ => "⚠".to_string(),
-        }
     }
 
     fn styled_status(&self, status: &str) -> String {
