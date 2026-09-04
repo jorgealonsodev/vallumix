@@ -105,7 +105,7 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           mkdir -p release
           SBOM_PATH="release/vallumix-sbom-${VERSION}.cdx.json"
-          cargo sbom --output-format cyclonedx-json -p vallumix-cli > "$SBOM_PATH"
+          cargo sbom --cargo-package vallumix-cli --output-format cyclone_dx_json_1_6 > "$SBOM_PATH"
           if [ ! -s "$SBOM_PATH" ]; then
             echo "ERROR: SBOM was not generated or is empty: $SBOM_PATH"
             exit 1
