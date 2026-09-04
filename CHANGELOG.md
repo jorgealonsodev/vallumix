@@ -12,7 +12,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Placeholder for breaking or significant behavioral changes.
+- `ServiceDisable` and `DisableAvahi` now report `CheckStatus::Error` when the
+  `systemctl` probe cannot be executed, instead of silently reporting the
+  service as compliant. An unverifiable control now lowers the compliance score
+  rather than inflating it.
+- `DisableAvahi` carries its systemd unit search paths as a field, with a
+  `with_all_paths()` constructor mirroring `ServiceDisable`. Production
+  behavior is unchanged.
 
 ### Deprecated
 
@@ -24,11 +30,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- Placeholder for bug fixes.
+- Service controls no longer report a service as compliant when the state probe
+  failed to run. `is_active().unwrap_or(false)` treated "could not determine the
+  state" as "not active", a silent failure toward the insecure side.
+- Removed an `ETXTBSY` race in the service control tests that failed roughly
+  half of all parallel runs. The fake `systemctl` executable is now written once
+  per test binary instead of once per test.
+- Cleared all `clippy -D warnings` lints and `rustfmt` drift, which had been
+  failing CI on every open dependency-update pull request.
 
 ### Security
 
-- Placeholder for security-related changes.
+- Bumped `quick-xml` to 0.41 (RUSTSEC-2026-0194, RUSTSEC-2026-0195),
+  `crossbeam-epoch` to 0.9.20 (RUSTSEC-2026-0204), `anyhow` to 1.0.104
+  (RUSTSEC-2026-0190) and `indicatif` to 0.18 (drops the unmaintained
+  `number_prefix`, RUSTSEC-2025-0119). These had been failing the scheduled
+  audit and deny workflows weekly since July 2026.
+- Removed the now-stale RUSTSEC-2025-0119 exception from `deny.toml`.
 
 ## [1.0.0] - 2026-05-01
 
