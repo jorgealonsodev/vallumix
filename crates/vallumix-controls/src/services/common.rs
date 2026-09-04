@@ -131,8 +131,21 @@ impl Control for ServiceDisable {
                 message: None,
             });
         }
-        let active = self.is_active().unwrap_or(false);
-        let enabled = self.is_enabled().unwrap_or(false);
+        // A probe we cannot run is NOT evidence of compliance. Swallowing the
+        // error here would report an unchecked service as Compliant, which
+        // fails toward the insecure side. Report Error via Ok(..) rather than
+        // Err(..) so one broken probe marks one control instead of aborting
+        // the whole run in apply.rs.
+        let (active, enabled) = match (self.is_active(), self.is_enabled()) {
+            (Ok(a), Ok(e)) => (a, e),
+            (Err(e), _) | (_, Err(e)) => {
+                return Ok(CheckResult {
+                    status: CheckStatus::Error,
+                    evidence: format!("could not query systemctl for {}: {}", self.service_name, e),
+                    message: Some(format!("{} state undetermined", self.service_name)),
+                });
+            }
+        };
         if !active && !enabled {
             Ok(CheckResult {
                 status: CheckStatus::Compliant,
@@ -234,8 +247,7 @@ impl Control for ServiceDisable {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::Write;
-    use std::os::unix::fs::PermissionsExt;
+    use crate::services::test_support::{fake_service, unrunnable_systemctl_service};
     use vallumix_core::context::Context;
     use vallumix_core::distro::Distro;
 
@@ -250,16 +262,18 @@ mod tests {
         )
     }
 
-    fn fake_systemctl_script(tmpdir: &std::path::Path, active: &str, enabled: &str) -> PathBuf {
-        let path = tmpdir.join("systemctl");
-        let script = format!(
-            "#!/bin/bash\ncase \"$1\" in\n  is-active) echo '{}'; exit 0 ;;\n  is-enabled) echo '{}'; exit 0 ;;\n  stop) exit 0 ;;\n  disable) exit 0 ;;\n  enable) exit 0 ;;\n  start) exit 0 ;;\nesac\n",
-            active, enabled
-        );
-        let mut f = std::fs::File::create(&path).unwrap();
-        f.write_all(script.as_bytes()).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
-        path
+    /// Builds a control around a fake service from the shared test harness.
+    /// See `services::test_support` for why the fake `systemctl` is written
+    /// once per test binary instead of once per test (ETXTBSY race).
+    fn control_for(svc: &crate::services::test_support::FakeService) -> ServiceDisable {
+        ServiceDisable::with_all_paths(
+            "T.1",
+            "test",
+            svc.name.clone(),
+            svc.systemctl_path.clone(),
+            Severity::Low,
+            vec![svc.unit_file.clone()],
+        )
     }
 
     #[test]
@@ -282,62 +296,38 @@ mod tests {
 
     #[test]
     fn check_compliant_when_service_inactive_and_disabled() {
-        let tmpdir = tempfile::tempdir().unwrap();
-        let svc_file = tmpdir.path().join("test-svc.service");
-        std::fs::write(&svc_file, "[Service]\n").unwrap();
-        let systemctl = fake_systemctl_script(tmpdir.path(), "inactive", "disabled");
-
-        let ctrl = ServiceDisable::with_all_paths(
-            "T.1",
-            "test",
-            "test-svc".into(),
-            systemctl,
-            Severity::Low,
-            vec![svc_file],
-        );
-        let result = ctrl.check(&test_ctx(false)).unwrap();
+        let svc = fake_service("inactive", "disabled");
+        let result = control_for(&svc).check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
         assert!(result.evidence.contains("stopped and disabled"));
     }
 
     #[test]
     fn check_non_compliant_when_service_active() {
-        let tmpdir = tempfile::tempdir().unwrap();
-        let svc_file = tmpdir.path().join("test-svc.service");
-        std::fs::write(&svc_file, "[Service]\n").unwrap();
-        let systemctl = fake_systemctl_script(tmpdir.path(), "active", "disabled");
-
-        let ctrl = ServiceDisable::with_all_paths(
-            "T.1",
-            "test",
-            "test-svc".into(),
-            systemctl,
-            Severity::Low,
-            vec![svc_file],
-        );
-        let result = ctrl.check(&test_ctx(false)).unwrap();
+        let svc = fake_service("active", "disabled");
+        let result = control_for(&svc).check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
         assert!(result.evidence.contains("active"));
     }
 
     #[test]
     fn check_non_compliant_when_service_enabled() {
-        let tmpdir = tempfile::tempdir().unwrap();
-        let svc_file = tmpdir.path().join("test-svc.service");
-        std::fs::write(&svc_file, "[Service]\n").unwrap();
-        let systemctl = fake_systemctl_script(tmpdir.path(), "inactive", "enabled");
-
-        let ctrl = ServiceDisable::with_all_paths(
-            "T.1",
-            "test",
-            "test-svc".into(),
-            systemctl,
-            Severity::Low,
-            vec![svc_file],
-        );
-        let result = ctrl.check(&test_ctx(false)).unwrap();
+        let svc = fake_service("inactive", "enabled");
+        let result = control_for(&svc).check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
         assert!(result.evidence.contains("enabled"));
+    }
+
+    #[test]
+    fn check_returns_error_when_systemctl_cannot_be_executed() {
+        // The unit file exists but the probe cannot run: an undetermined state
+        // must never be reported as Compliant.
+        let svc = unrunnable_systemctl_service();
+        let result = control_for(&svc).check(&test_ctx(false)).unwrap();
+        assert_eq!(result.status, CheckStatus::Error);
+        assert_ne!(result.status, CheckStatus::Compliant);
+        assert!(result.evidence.contains(&svc.name));
+        assert!(result.evidence.contains("systemctl"));
     }
 
     #[test]
@@ -357,20 +347,8 @@ mod tests {
 
     #[test]
     fn apply_stops_and_disables_service() {
-        let tmpdir = tempfile::tempdir().unwrap();
-        let svc_file = tmpdir.path().join("test-svc.service");
-        std::fs::write(&svc_file, "[Service]\n").unwrap();
-        let systemctl = fake_systemctl_script(tmpdir.path(), "active", "enabled");
-
-        let ctrl = ServiceDisable::with_all_paths(
-            "T.1",
-            "test",
-            "test-svc".into(),
-            systemctl,
-            Severity::Low,
-            vec![svc_file],
-        );
-        let result = ctrl.apply(&test_ctx(false)).unwrap();
+        let svc = fake_service("active", "enabled");
+        let result = control_for(&svc).apply(&test_ctx(false)).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
     }
 

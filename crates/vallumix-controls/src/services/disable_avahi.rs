@@ -13,14 +13,12 @@ use vallumix_core::profile::Backup;
 pub struct DisableAvahi {
     service_name: String,
     systemctl_path: PathBuf,
+    search_paths: Vec<PathBuf>,
 }
 
 impl Default for DisableAvahi {
     fn default() -> Self {
-        DisableAvahi {
-            service_name: "avahi-daemon".into(),
-            systemctl_path: PathBuf::from("/usr/bin/systemctl"),
-        }
+        Self::with_paths("avahi-daemon".into(), PathBuf::from("/usr/bin/systemctl"))
     }
 }
 
@@ -30,9 +28,23 @@ impl DisableAvahi {
     }
 
     pub fn with_paths(service_name: String, systemctl_path: PathBuf) -> Self {
+        let search_paths = default_unit_paths(&service_name);
         DisableAvahi {
             service_name,
             systemctl_path,
+            search_paths,
+        }
+    }
+
+    pub fn with_all_paths(
+        service_name: String,
+        systemctl_path: PathBuf,
+        search_paths: Vec<PathBuf>,
+    ) -> Self {
+        DisableAvahi {
+            service_name,
+            systemctl_path,
+            search_paths,
         }
     }
 
@@ -56,13 +68,17 @@ impl DisableAvahi {
 
     fn service_exists(&self) -> bool {
         // Check if the service unit exists
-        let paths = [
-            format!("/etc/systemd/system/{}.service", self.service_name),
-            format!("/lib/systemd/system/{}.service", self.service_name),
-            format!("/usr/lib/systemd/system/{}.service", self.service_name),
-        ];
-        paths.iter().any(|p| std::path::Path::new(p).exists())
+        self.search_paths.iter().any(|p| p.exists())
     }
+}
+
+/// The systemd unit locations a service can be installed to.
+fn default_unit_paths(service_name: &str) -> Vec<PathBuf> {
+    vec![
+        PathBuf::from(format!("/etc/systemd/system/{}.service", service_name)),
+        PathBuf::from(format!("/lib/systemd/system/{}.service", service_name)),
+        PathBuf::from(format!("/usr/lib/systemd/system/{}.service", service_name)),
+    ]
 }
 
 impl Control for DisableAvahi {
@@ -100,8 +116,21 @@ impl Control for DisableAvahi {
             });
         }
 
-        let active = self.is_service_active().unwrap_or(false);
-        let enabled = self.is_service_enabled().unwrap_or(false);
+        // A probe we cannot run is NOT evidence of compliance. Swallowing the
+        // error here would report an unchecked service as Compliant, which
+        // fails toward the insecure side. Report Error via Ok(..) rather than
+        // Err(..) so one broken probe marks one control instead of aborting
+        // the whole run in apply.rs.
+        let (active, enabled) = match (self.is_service_active(), self.is_service_enabled()) {
+            (Ok(a), Ok(e)) => (a, e),
+            (Err(e), _) | (_, Err(e)) => {
+                return Ok(CheckResult {
+                    status: CheckStatus::Error,
+                    evidence: format!("could not query systemctl for {}: {}", self.service_name, e),
+                    message: Some(format!("{} state undetermined", self.service_name)),
+                });
+            }
+        };
 
         if !active && !enabled {
             Ok(CheckResult {
@@ -214,6 +243,32 @@ impl Control for DisableAvahi {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::services::test_support::unrunnable_systemctl_service;
+
+    #[test]
+    fn check_returns_error_when_systemctl_cannot_be_executed() {
+        // The unit file exists but the probe cannot run: an undetermined state
+        // must never be reported as Compliant.
+        let svc = unrunnable_systemctl_service();
+        let ctrl = DisableAvahi::with_all_paths(
+            svc.name.clone(),
+            svc.systemctl_path.clone(),
+            vec![svc.unit_file.clone()],
+        );
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
+        let result = ctrl.check(&ctx).unwrap();
+        assert_eq!(result.status, CheckStatus::Error);
+        assert_ne!(result.status, CheckStatus::Compliant);
+        assert!(result.evidence.contains(&svc.name));
+        assert!(result.evidence.contains("systemctl"));
+    }
 
     #[test]
     fn check_compliant_when_service_not_installed() {

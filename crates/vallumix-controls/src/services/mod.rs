@@ -1,5 +1,7 @@
 pub mod common;
 pub mod disable_avahi;
+#[cfg(test)]
+pub(crate) mod test_support;
 
 macro_rules! def_service_control {
     ($name:ident, $id:expr, $desc:expr, $svc:expr, $sev:expr) => {
