@@ -19,6 +19,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `DisableAvahi` carries its systemd unit search paths as a field, with a
   `with_all_paths()` constructor mirroring `ServiceDisable`. Production
   behavior is unchanged.
+- Updated dependencies, superseding the open Dependabot pull requests:
+  `nix` 0.27 -> 0.31, `clap_mangen` 0.2 -> 0.3, `clap_complete` 4.6.3 -> 4.6.7,
+  `insta` 1.47.2 -> 1.48.0, `chrono` 0.4.44 -> 0.4.45, `serde_json` 1.0.149 ->
+  1.0.150 and `assert_cmd` 2.2.1 -> 2.2.2. The `nix` and `clap_mangen` bumps
+  cross semver-breaking boundaries but needed no source changes; the API
+  surface in use (`gethostname`, `geteuid`, `Man::new`) is unchanged.
 
 ### Deprecated
 
