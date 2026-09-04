@@ -7,6 +7,13 @@ pub struct PermsContext {
 }
 
 #[cfg(test)]
+impl Default for PermsContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 impl PermsContext {
     pub fn new() -> Self {
         PermsContext {

@@ -17,6 +17,12 @@ macro_rules! def_sshd_control {
             }
         }
 
+        impl Default for $name {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
         impl vallumix_core::control::Control for $name {
             fn id(&self) -> &str { self.0.id() }
             fn description(&self) -> &str { self.0.description() }

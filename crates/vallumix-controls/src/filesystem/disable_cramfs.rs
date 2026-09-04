@@ -120,7 +120,7 @@ mod tests {
     #[test]
     fn check_compliant_when_cramfs_absent() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\tsquashfs\n").unwrap();
+        writeln!(tmp, "nodev\tsquashfs").unwrap();
         let ctrl = DisableCramfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         let ctx = Context::with_paths(
             "test".into(),
@@ -137,7 +137,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_cramfs_present() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\tcramfs\n").unwrap();
+        writeln!(tmp, "nodev\tcramfs").unwrap();
         let ctrl = DisableCramfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         let ctx = Context::with_paths(
             "test".into(),

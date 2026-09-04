@@ -81,7 +81,7 @@ mod tests {
     #[test]
     fn check_compliant_when_absent() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\text4\n").unwrap();
+        writeln!(tmp, "nodev\text4").unwrap();
         let ctrl = DisableUsbStorage::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Compliant);
     }
@@ -89,7 +89,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_present() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\tusb-storage\n").unwrap();
+        writeln!(tmp, "nodev\tusb-storage").unwrap();
         let ctrl = DisableUsbStorage::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::NonCompliant);
     }

@@ -16,7 +16,7 @@ pub type ControlRegistry = HashMap<String, Box<dyn control::Control>>;
 mod tests {
     use std::path::PathBuf;
 
-    use serde::Deserialize;
+    
 
     use crate::control::Control;
     use crate::distro::Distro;

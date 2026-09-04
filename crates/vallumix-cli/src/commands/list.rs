@@ -1,5 +1,4 @@
 use anyhow::Result;
-use vallumix_core::control::Control;
 use vallumix_controls::registry;
 
 pub fn run() -> Result<i32> {

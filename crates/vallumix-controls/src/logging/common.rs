@@ -7,6 +7,13 @@ pub struct LoggingContext {
 }
 
 #[cfg(test)]
+impl Default for LoggingContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 impl LoggingContext {
     pub fn new() -> Self {
         LoggingContext {

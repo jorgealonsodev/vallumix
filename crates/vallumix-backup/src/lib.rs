@@ -137,7 +137,7 @@ impl BackupManager {
         }
         fs::create_dir_all(path.parent().unwrap())?;
         let content = serde_json::to_string_pretty(&session)
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+            .map_err(std::io::Error::other)?;
         fs::write(&path, content)?;
         Ok(())
     }
@@ -261,7 +261,7 @@ impl BackupManager {
                 control_count: 0,
             });
         }
-        sessions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        sessions.sort_by_key(|a| std::cmp::Reverse(a.timestamp));
         Ok(sessions)
     }
 
@@ -390,8 +390,8 @@ fn next_version(control_dir: &Path) -> Result<usize, ControlError> {
     for entry in fs::read_dir(control_dir)? {
         let entry = entry?;
         let name = entry.file_name().to_string_lossy().to_string();
-        if name.starts_with('v') {
-            if let Ok(v) = name[1..].parse::<usize>() {
+        if let Some(rest) = name.strip_prefix('v') {
+            if let Ok(v) = rest.parse::<usize>() {
                 if v > max {
                     max = v;
                 }
@@ -541,7 +541,7 @@ mod tests {
         let mgr = BackupManager::new(tmpdir.path().join("backups"));
         mgr.create_backup("sess1", "1.1.1.1", &original).unwrap();
 
-        let mut list = mgr.list("sess1").unwrap();
+        let list = mgr.list("sess1").unwrap();
         // Remove the backup file to simulate corruption
         fs::remove_file(&list[0].backup_path).unwrap();
 

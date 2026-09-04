@@ -41,6 +41,9 @@ impl SysctlControl {
         }
     }
 
+    // Builder-style constructor: every parameter is a distinct static attribute of the
+    // control, so grouping them into structs would only add indirection and hurt readability.
+    #[allow(clippy::too_many_arguments)]
     pub fn with_paths(
         id: &'static str,
         description: &'static str,
@@ -167,10 +170,10 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/all")).unwrap();
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/all/send_redirects"), "0\n").unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "0\n").unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
 
         let ctrl = make_sysctl_control(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -183,10 +186,10 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/all")).unwrap();
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/all/send_redirects"), "1\n").unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "1\n").unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
 
         let ctrl = make_sysctl_control(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();

@@ -7,6 +7,13 @@ pub struct AuthContext {
 }
 
 #[cfg(test)]
+impl Default for AuthContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 impl AuthContext {
     pub fn new() -> Self {
         AuthContext {

@@ -50,43 +50,28 @@ fn main() {
     let exit_code = match &cli.command {
         Commands::Apply => {
             if !check_privileges() {
-                eprintln!("{} {}", "Error:".red().bold(), "apply requires root privileges");
+                eprintln!("{} apply requires root privileges", "Error:".red().bold());
                 std::process::exit(3);
             }
-            match commands::apply::run(
+            commands::apply::run(
                 &cli.profile,
                 cli.dry_run,
                 cli.threshold,
                 report_formats.clone(),
-                cli.output.as_ref().map(|p| p.as_path()),
+                cli.output.as_deref(),
                 cli.quiet,
-            ) {
-                Ok(code) => code,
-                Err(_) => 2,
-            }
+            ).unwrap_or(2)
         }
-        Commands::Audit => match commands::audit::run(
+        Commands::Audit => commands::audit::run(
             &cli.profile,
             cli.threshold,
             report_formats.clone(),
-            cli.output.as_ref().map(|p| p.as_path()),
+            cli.output.as_deref(),
             cli.quiet,
-        ) {
-            Ok(code) => code,
-            Err(_) => 2,
-        },
-        Commands::Rollback { control_id, session } => match commands::rollback::run(control_id.clone(), session.clone()) {
-            Ok(code) => code,
-            Err(_) => 2,
-        },
-        Commands::List => match commands::list::run() {
-            Ok(code) => code,
-            Err(_) => 2,
-        },
-        Commands::Completion { shell } => match commands::completion::run(*shell) {
-            Ok(code) => code,
-            Err(_) => 2,
-        },
+        ).unwrap_or(2),
+        Commands::Rollback { control_id, session } => commands::rollback::run(control_id.clone(), session.clone()).unwrap_or(2),
+        Commands::List => commands::list::run().unwrap_or(2),
+        Commands::Completion { shell } => commands::completion::run(*shell).unwrap_or(2),
     };
 
     std::process::exit(exit_code);

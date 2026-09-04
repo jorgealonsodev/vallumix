@@ -106,7 +106,7 @@ mod tests {
     #[test]
     fn check_compliant_with_all_options() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "tmpfs /tmp tmpfs rw,nodev,nosuid,noexec 0 0\n").unwrap();
+        writeln!(tmp, "tmpfs /tmp tmpfs rw,nodev,nosuid,noexec 0 0").unwrap();
         let ctrl = HardenTmpfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Compliant);
     }
@@ -114,7 +114,7 @@ mod tests {
     #[test]
     fn check_non_compliant_missing_option() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "tmpfs /tmp tmpfs rw,nodev 0 0\n").unwrap();
+        writeln!(tmp, "tmpfs /tmp tmpfs rw,nodev 0 0").unwrap();
         let ctrl = HardenTmpfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::NonCompliant);
     }
@@ -122,7 +122,7 @@ mod tests {
     #[test]
     fn check_skipped_when_not_tmpfs() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "ext4 / ext4 rw 0 0\n").unwrap();
+        writeln!(tmp, "ext4 / ext4 rw 0 0").unwrap();
         let ctrl = HardenTmpfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Skipped);
     }

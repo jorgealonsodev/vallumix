@@ -88,7 +88,7 @@ mod tests {
     #[test]
     fn compliant_with_banner() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "Banner /etc/issue.net\n").unwrap();
+        writeln!(tmp, "Banner /etc/issue.net").unwrap();
         let ctrl = SshSetBanner::with_path(tmp.path().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Compliant);
     }
@@ -96,7 +96,7 @@ mod tests {
     #[test]
     fn non_compliant_without() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "Port 22\n").unwrap();
+        writeln!(tmp, "Port 22").unwrap();
         let ctrl = SshSetBanner::with_path(tmp.path().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::NonCompliant);
     }

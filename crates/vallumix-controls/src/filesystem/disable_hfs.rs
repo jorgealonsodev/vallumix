@@ -43,7 +43,7 @@ impl Control for DisableHfs {
         let content = fs::read_to_string(&self.filesystems_path)?;
         let present = content.lines().any(|line| {
             let words: Vec<_> = line.split_whitespace().collect();
-            words.iter().any(|&w| w == "hfs")
+            words.contains(&"hfs")
         });
         Ok(if present {
             CheckResult { status: CheckStatus::NonCompliant, evidence: "hfs found in /proc/filesystems".into(), message: Some("hfs is available".into()) }
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn check_compliant_when_absent() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\tsquashfs\n").unwrap();
+        writeln!(tmp, "nodev\tsquashfs").unwrap();
         let ctrl = DisableHfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Compliant);
     }
@@ -92,7 +92,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_present() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\thfs\n").unwrap();
+        writeln!(tmp, "nodev\thfs").unwrap();
         let ctrl = DisableHfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::NonCompliant);
     }

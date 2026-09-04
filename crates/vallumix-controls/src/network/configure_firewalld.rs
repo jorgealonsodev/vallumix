@@ -69,10 +69,6 @@ impl Control for ConfigureFirewalld {
 mod tests {
     use super::*;
 
-    fn ctx() -> Context {
-        Context::with_paths("t".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false)
-    }
-
     #[test]
     fn control_has_correct_id() {
         let ctrl = ConfigureFirewalld::new();
