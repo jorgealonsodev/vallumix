@@ -7,7 +7,6 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 description = "Vallumix CLI — CIS Linux hardening tool"
-readme = "README.md"
 keywords = ["cis", "linux", "hardening", "compliance", "security"]
 categories = ["command-line-utilities"]
 
