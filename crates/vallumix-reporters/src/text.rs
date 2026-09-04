@@ -69,10 +69,7 @@ impl vallumix_core::profile::Reporter for TextReporter {
         lines.push("━".repeat(60));
         lines.push(format!(
             "  Total: {:3}   Pass: {:3}   Fail: {:3}   Skip: {:3}",
-            report.summary.total,
-            report.summary.pass,
-            report.summary.fail,
-            report.summary.skip
+            report.summary.total, report.summary.pass, report.summary.fail, report.summary.skip
         ));
         lines.push(format!(
             "  Compliance Rate: {:.1}%\n",
@@ -85,10 +82,7 @@ impl vallumix_core::profile::Reporter for TextReporter {
             let status = self.styled_status(&control.status);
             lines.push(format!(
                 "{} {} {} — {}",
-                sev,
-                status,
-                control.id,
-                control.description
+                sev, status, control.id, control.description
             ));
             if !control.evidence.is_empty() {
                 lines.push(format!("      → {}", control.evidence));

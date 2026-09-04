@@ -8,10 +8,24 @@ macro_rules! def_sysctl_control {
 
         impl $name {
             pub fn new() -> Self {
-                $name(super::common::SysctlControl::new($id, $desc, $sev, $params, $dropin, $content))
+                $name(super::common::SysctlControl::new(
+                    $id, $desc, $sev, $params, $dropin, $content,
+                ))
             }
-            pub fn with_paths(proc_prefix: std::path::PathBuf, sysctl_dir: std::path::PathBuf) -> Self {
-                $name(super::common::SysctlControl::with_paths($id, $desc, $sev, $params, sysctl_dir, proc_prefix, $dropin, $content))
+            pub fn with_paths(
+                proc_prefix: std::path::PathBuf,
+                sysctl_dir: std::path::PathBuf,
+            ) -> Self {
+                $name(super::common::SysctlControl::with_paths(
+                    $id,
+                    $desc,
+                    $sev,
+                    $params,
+                    sysctl_dir,
+                    proc_prefix,
+                    $dropin,
+                    $content,
+                ))
             }
         }
 
@@ -22,18 +36,41 @@ macro_rules! def_sysctl_control {
         }
 
         impl vallumix_core::control::Control for $name {
-            fn id(&self) -> &str { self.0.id() }
-            fn description(&self) -> &str { self.0.description() }
-            fn severity(&self) -> vallumix_core::control::Severity { self.0.severity() }
-            fn applicable_distros(&self) -> &[vallumix_core::distro::Distro] { self.0.applicable_distros() }
-            fn category(&self) -> vallumix_core::control::Category { self.0.category() }
-            fn check(&self, ctx: &vallumix_core::context::Context) -> vallumix_core::control::ControlResult {
+            fn id(&self) -> &str {
+                self.0.id()
+            }
+            fn description(&self) -> &str {
+                self.0.description()
+            }
+            fn severity(&self) -> vallumix_core::control::Severity {
+                self.0.severity()
+            }
+            fn applicable_distros(&self) -> &[vallumix_core::distro::Distro] {
+                self.0.applicable_distros()
+            }
+            fn category(&self) -> vallumix_core::control::Category {
+                self.0.category()
+            }
+            fn check(
+                &self,
+                ctx: &vallumix_core::context::Context,
+            ) -> vallumix_core::control::ControlResult {
                 self.0.check(ctx)
             }
-            fn apply(&self, ctx: &vallumix_core::context::Context) -> std::result::Result<vallumix_core::control::ApplyResult, vallumix_core::error::ControlError> {
+            fn apply(
+                &self,
+                ctx: &vallumix_core::context::Context,
+            ) -> std::result::Result<
+                vallumix_core::control::ApplyResult,
+                vallumix_core::error::ControlError,
+            > {
                 self.0.apply(ctx)
             }
-            fn rollback(&self, ctx: &vallumix_core::context::Context, backup: &vallumix_core::profile::Backup) -> std::result::Result<(), vallumix_core::error::ControlError> {
+            fn rollback(
+                &self,
+                ctx: &vallumix_core::context::Context,
+                backup: &vallumix_core::profile::Backup,
+            ) -> std::result::Result<(), vallumix_core::error::ControlError> {
                 self.0.rollback(ctx, backup)
             }
             fn clone_box(&self) -> std::boxed::Box<dyn vallumix_core::control::Control> {
@@ -109,9 +146,7 @@ pub mod sysctl_enable_syncookies {
         "3.2.7",
         "Ensure TCP SYN Cookies is enabled",
         vallumix_core::control::Severity::Medium,
-        vec![
-            ("net/ipv4/tcp_syncookies", "1"),
-        ],
+        vec![("net/ipv4/tcp_syncookies", "1"),],
         "99-vallumix-syncookies.conf",
         "net.ipv4.tcp_syncookies = 1\n"
     );
@@ -137,11 +172,10 @@ pub mod configure_firewalld;
 #[cfg(test)]
 mod tests {
     use super::*;
-    
-    use vallumix_core::control::Control;
+
     use vallumix_core::context::Context;
+    use vallumix_core::control::Control;
     use vallumix_core::distro::Distro;
-    
 
     fn test_ctx(dry_run: bool) -> Context {
         Context::with_paths(
@@ -162,11 +196,21 @@ mod tests {
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
         std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "0\n").unwrap();
-        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::write(
+            proc_prefix.join("net/ipv4/conf/default/send_redirects"),
+            "0\n",
+        )
+        .unwrap();
 
-        let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(proc_prefix, sysctl_dir);
+        let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(
+            proc_prefix,
+            sysctl_dir,
+        );
         let result = ctrl.check(&test_ctx(false)).unwrap();
-        assert_eq!(result.status, vallumix_core::control::CheckStatus::Compliant);
+        assert_eq!(
+            result.status,
+            vallumix_core::control::CheckStatus::Compliant
+        );
     }
 
     #[test]
@@ -177,11 +221,21 @@ mod tests {
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
         std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "1\n").unwrap();
-        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::write(
+            proc_prefix.join("net/ipv4/conf/default/send_redirects"),
+            "0\n",
+        )
+        .unwrap();
 
-        let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(proc_prefix, sysctl_dir);
+        let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(
+            proc_prefix,
+            sysctl_dir,
+        );
         let result = ctrl.check(&test_ctx(false)).unwrap();
-        assert_eq!(result.status, vallumix_core::control::CheckStatus::NonCompliant);
+        assert_eq!(
+            result.status,
+            vallumix_core::control::CheckStatus::NonCompliant
+        );
     }
 
     #[test]
@@ -190,7 +244,10 @@ mod tests {
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
 
-        let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(proc_prefix, sysctl_dir.clone());
+        let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(
+            proc_prefix,
+            sysctl_dir.clone(),
+        );
         let result = ctrl.apply(&test_ctx(false)).unwrap();
         assert_eq!(result.status, vallumix_core::control::ApplyStatus::Applied);
 
@@ -207,12 +264,26 @@ mod tests {
         let sysctl_dir = tmpdir.path().join("sysctl.d");
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(proc_prefix.join("net/ipv4/conf/all/accept_source_route"), "0\n").unwrap();
-        std::fs::write(proc_prefix.join("net/ipv4/conf/default/accept_source_route"), "0\n").unwrap();
+        std::fs::write(
+            proc_prefix.join("net/ipv4/conf/all/accept_source_route"),
+            "0\n",
+        )
+        .unwrap();
+        std::fs::write(
+            proc_prefix.join("net/ipv4/conf/default/accept_source_route"),
+            "0\n",
+        )
+        .unwrap();
 
-        let ctrl = sysctl_disable_source_route::SysctlDisableSourceRoute::with_paths(proc_prefix, sysctl_dir);
+        let ctrl = sysctl_disable_source_route::SysctlDisableSourceRoute::with_paths(
+            proc_prefix,
+            sysctl_dir,
+        );
         let result = ctrl.check(&test_ctx(false)).unwrap();
-        assert_eq!(result.status, vallumix_core::control::CheckStatus::Compliant);
+        assert_eq!(
+            result.status,
+            vallumix_core::control::CheckStatus::Compliant
+        );
     }
 
     #[test]
@@ -221,7 +292,10 @@ mod tests {
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
 
-        let ctrl = sysctl_disable_accept_redirects::SysctlDisableAcceptRedirects::with_paths(proc_prefix, sysctl_dir.clone());
+        let ctrl = sysctl_disable_accept_redirects::SysctlDisableAcceptRedirects::with_paths(
+            proc_prefix,
+            sysctl_dir.clone(),
+        );
         let result = ctrl.apply(&test_ctx(false)).unwrap();
         assert_eq!(result.status, vallumix_core::control::ApplyStatus::Applied);
 
@@ -241,9 +315,13 @@ mod tests {
         std::fs::write(proc_prefix.join("net/ipv4/conf/all/rp_filter"), "1\n").unwrap();
         std::fs::write(proc_prefix.join("net/ipv4/conf/default/rp_filter"), "1\n").unwrap();
 
-        let ctrl = sysctl_enable_rp_filter::SysctlEnableRpFilter::with_paths(proc_prefix, sysctl_dir);
+        let ctrl =
+            sysctl_enable_rp_filter::SysctlEnableRpFilter::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
-        assert_eq!(result.status, vallumix_core::control::CheckStatus::Compliant);
+        assert_eq!(
+            result.status,
+            vallumix_core::control::CheckStatus::Compliant
+        );
     }
 
     #[test]
@@ -254,8 +332,12 @@ mod tests {
         std::fs::create_dir_all(proc_prefix.join("net/ipv4")).unwrap();
         std::fs::write(proc_prefix.join("net/ipv4/tcp_syncookies"), "1\n").unwrap();
 
-        let ctrl = sysctl_enable_syncookies::SysctlEnableSyncookies::with_paths(proc_prefix, sysctl_dir);
+        let ctrl =
+            sysctl_enable_syncookies::SysctlEnableSyncookies::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
-        assert_eq!(result.status, vallumix_core::control::CheckStatus::Compliant);
+        assert_eq!(
+            result.status,
+            vallumix_core::control::CheckStatus::Compliant
+        );
     }
 }

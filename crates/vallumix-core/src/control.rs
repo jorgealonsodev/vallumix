@@ -101,18 +101,38 @@ mod tests {
     fn category_default_impl_returns_filesystem() {
         struct DummyControl;
         impl Control for DummyControl {
-            fn id(&self) -> &str { "dummy" }
-            fn description(&self) -> &str { "dummy" }
-            fn severity(&self) -> Severity { Severity::Low }
-            fn applicable_distros(&self) -> &[Distro] { &[] }
+            fn id(&self) -> &str {
+                "dummy"
+            }
+            fn description(&self) -> &str {
+                "dummy"
+            }
+            fn severity(&self) -> Severity {
+                Severity::Low
+            }
+            fn applicable_distros(&self) -> &[Distro] {
+                &[]
+            }
             fn check(&self, _ctx: &Context) -> ControlResult {
-                Ok(CheckResult { status: CheckStatus::Compliant, evidence: "".into(), message: None })
+                Ok(CheckResult {
+                    status: CheckStatus::Compliant,
+                    evidence: "".into(),
+                    message: None,
+                })
             }
             fn apply(&self, _ctx: &Context) -> Result<ApplyResult, ControlError> {
-                Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: None })
+                Ok(ApplyResult {
+                    status: ApplyStatus::Applied,
+                    backup_path: None,
+                    message: None,
+                })
             }
-            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-            fn clone_box(&self) -> Box<dyn Control> { Box::new(DummyControl) }
+            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+                Ok(())
+            }
+            fn clone_box(&self) -> Box<dyn Control> {
+                Box::new(DummyControl)
+            }
         }
         let ctrl = DummyControl;
         assert_eq!(ctrl.category(), Category::Filesystem);
@@ -194,8 +214,6 @@ mod tests {
             evidence: "ok".into(),
             message: None,
         });
-        let _err: ControlResult = Err(ControlError::Io(std::io::Error::other(
-            "test",
-        )));
+        let _err: ControlResult = Err(ControlError::Io(std::io::Error::other("test")));
     }
 }

@@ -2,8 +2,10 @@ use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -121,7 +123,8 @@ mod tests {
     fn check_compliant_when_cramfs_absent() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         writeln!(tmp, "nodev\tsquashfs").unwrap();
-        let ctrl = DisableCramfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
+        let ctrl =
+            DisableCramfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         let ctx = Context::with_paths(
             "test".into(),
             Distro::Debian12,
@@ -138,7 +141,8 @@ mod tests {
     fn check_non_compliant_when_cramfs_present() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         writeln!(tmp, "nodev\tcramfs").unwrap();
-        let ctrl = DisableCramfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
+        let ctrl =
+            DisableCramfs::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         let ctx = Context::with_paths(
             "test".into(),
             Distro::Debian12,
@@ -154,10 +158,8 @@ mod tests {
     #[test]
     fn apply_writes_modprobe_file() {
         let tmpdir = tempfile::tempdir().unwrap();
-        let ctrl = DisableCramfs::with_paths(
-            tmpdir.path().join("fs"),
-            tmpdir.path().join("modprobe.d"),
-        );
+        let ctrl =
+            DisableCramfs::with_paths(tmpdir.path().join("fs"), tmpdir.path().join("modprobe.d"));
         let ctx = Context::with_paths(
             "test".into(),
             Distro::Debian12,
@@ -168,17 +170,20 @@ mod tests {
         );
         let result = ctrl.apply(&ctx).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
-        let content = fs::read_to_string(tmpdir.path().join("modprobe.d/vallumix-disable-cramfs.conf")).unwrap();
+        let content = fs::read_to_string(
+            tmpdir
+                .path()
+                .join("modprobe.d/vallumix-disable-cramfs.conf"),
+        )
+        .unwrap();
         assert!(content.contains("install cramfs /bin/true"));
     }
 
     #[test]
     fn apply_skips_in_dry_run() {
         let tmpdir = tempfile::tempdir().unwrap();
-        let ctrl = DisableCramfs::with_paths(
-            tmpdir.path().join("fs"),
-            tmpdir.path().join("modprobe.d"),
-        );
+        let ctrl =
+            DisableCramfs::with_paths(tmpdir.path().join("fs"), tmpdir.path().join("modprobe.d"));
         let ctx = Context::with_paths(
             "test".into(),
             Distro::Debian12,
@@ -196,7 +201,14 @@ mod tests {
         let manifest = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         let fixture = manifest.join("tests/fixtures/filesystems_no_cramfs");
         let ctrl = DisableCramfs::with_paths(fixture, manifest.join("tests/fixtures"));
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
     }
@@ -206,7 +218,14 @@ mod tests {
         let manifest = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         let fixture = manifest.join("tests/fixtures/filesystems_with_cramfs");
         let ctrl = DisableCramfs::with_paths(fixture, manifest.join("tests/fixtures"));
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }

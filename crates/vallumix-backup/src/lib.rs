@@ -87,7 +87,10 @@ impl BackupManager {
         fs::copy(original_path, &backup_path)?;
 
         // Persist original path for reliable rollback/listing later.
-        fs::write(version_dir.join(".original_path"), original_path.to_string_lossy().as_ref())?;
+        fs::write(
+            version_dir.join(".original_path"),
+            original_path.to_string_lossy().as_ref(),
+        )?;
 
         let checksum = self.checksum(&backup_path)?;
         let checksum_path = backup_path.with_extension(format!("{}.sha256", filename));
@@ -136,8 +139,7 @@ impl BackupManager {
             session.control_ids.push(control_id.into());
         }
         fs::create_dir_all(path.parent().unwrap())?;
-        let content = serde_json::to_string_pretty(&session)
-            .map_err(std::io::Error::other)?;
+        let content = serde_json::to_string_pretty(&session).map_err(std::io::Error::other)?;
         fs::write(&path, content)?;
         Ok(())
     }
@@ -225,7 +227,11 @@ impl BackupManager {
             }
         }
 
-        metas.sort_by(|a, b| a.control_id.cmp(&b.control_id).then(a.version.cmp(&b.version)));
+        metas.sort_by(|a, b| {
+            a.control_id
+                .cmp(&b.control_id)
+                .then(a.version.cmp(&b.version))
+        });
         Ok(metas)
     }
 
@@ -421,7 +427,8 @@ mod tests {
         // session.json should exist
         let session_json = mgr.session_json_path("sess1");
         assert!(session_json.exists());
-        let session: BackupSession = serde_json::from_str(&fs::read_to_string(&session_json).unwrap()).unwrap();
+        let session: BackupSession =
+            serde_json::from_str(&fs::read_to_string(&session_json).unwrap()).unwrap();
         assert!(session.control_ids.contains(&"1.1.1.1".into()));
     }
 

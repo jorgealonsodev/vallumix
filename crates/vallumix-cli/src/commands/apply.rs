@@ -3,8 +3,8 @@ use std::path::Path;
 use anyhow::Result;
 use chrono::Utc;
 use indicatif::{ProgressBar, ProgressStyle};
-use vallumix_core::control::{ApplyStatus, CheckStatus};
 use vallumix_core::context::Context;
+use vallumix_core::control::{ApplyStatus, CheckStatus};
 use vallumix_core::distro::Distro;
 use vallumix_core::profile::{ControlReport, Profile, Reporter};
 use vallumix_reporters::{build_report, HtmlReporter, JsonReporter, JunitReporter, TextReporter};
@@ -31,10 +31,7 @@ pub fn run(
         None
     } else {
         let pb = ProgressBar::new(controls.len() as u64);
-        pb.set_style(
-            ProgressStyle::with_template("[{pos}/{len}] {msg}")
-                .expect("valid template"),
-        );
+        pb.set_style(ProgressStyle::with_template("[{pos}/{len}] {msg}").expect("valid template"));
         Some(pb)
     };
 
@@ -56,12 +53,16 @@ pub fn run(
                     check_result.message,
                 )
             }
-            CheckStatus::Skipped => {
-                ("Skipped".to_string(), check_result.evidence, check_result.message)
-            }
-            CheckStatus::Error => {
-                ("Error".to_string(), check_result.evidence, check_result.message)
-            }
+            CheckStatus::Skipped => (
+                "Skipped".to_string(),
+                check_result.evidence,
+                check_result.message,
+            ),
+            CheckStatus::Error => (
+                "Error".to_string(),
+                check_result.evidence,
+                check_result.message,
+            ),
             CheckStatus::Warning(ref msg) => (
                 "Warning".to_string(),
                 check_result.evidence.clone(),
@@ -124,11 +125,7 @@ pub fn run(
     }
 
     let total = controls.len();
-    let report = build_report(
-        ctx.hostname.clone(),
-        distro.to_string(),
-        control_reports,
-    );
+    let report = build_report(ctx.hostname.clone(), distro.to_string(), control_reports);
 
     if let Some(formats) = report_formats {
         for fmt in formats {

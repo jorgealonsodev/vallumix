@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -139,7 +141,10 @@ impl Control for DisableAvahi {
             return Ok(ApplyResult {
                 status: ApplyStatus::Applied,
                 backup_path: None,
-                message: Some(format!("{} not installed — no action needed", self.service_name)),
+                message: Some(format!(
+                    "{} not installed — no action needed",
+                    self.service_name
+                )),
             });
         }
 
@@ -167,7 +172,10 @@ impl Control for DisableAvahi {
         } else {
             let mut errors = Vec::new();
             if !stop.status.success() {
-                errors.push(format!("stop failed: {}", String::from_utf8_lossy(&stop.stderr)));
+                errors.push(format!(
+                    "stop failed: {}",
+                    String::from_utf8_lossy(&stop.stderr)
+                ));
             }
             if !disable.status.success() {
                 errors.push(format!(

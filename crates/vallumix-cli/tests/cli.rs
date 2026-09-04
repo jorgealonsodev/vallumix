@@ -187,9 +187,7 @@ fn cli_audit_output_file() {
 #[test]
 fn cli_rollback_no_session() {
     let mut cmd = Command::cargo_bin("vallumix").unwrap();
-    cmd.arg("rollback")
-        .arg("--control-id")
-        .arg("9.9.9.9");
+    cmd.arg("rollback").arg("--control-id").arg("9.9.9.9");
     // No backup exists for this control → exit code 2
     cmd.assert().failure().code(2);
 }

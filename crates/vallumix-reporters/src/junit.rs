@@ -24,9 +24,11 @@ impl vallumix_core::profile::Reporter for JunitReporter {
         let mut writer = Writer::new_with_indent(Vec::new(), b' ', 2);
 
         writer
-            .write_event(Event::Decl(
-                quick_xml::events::BytesDecl::new("1.0", Some("UTF-8"), None),
-            ))
+            .write_event(Event::Decl(quick_xml::events::BytesDecl::new(
+                "1.0",
+                Some("UTF-8"),
+                None,
+            )))
             .map_err(|e| ReportError::Serialize(e.to_string()))?;
 
         let mut testsuite = BytesStart::new("testsuite");
@@ -58,9 +60,9 @@ impl vallumix_core::profile::Reporter for JunitReporter {
                         .write_event(Event::Start(failure))
                         .map_err(|e| ReportError::Serialize(e.to_string()))?;
                     writer
-                        .write_event(Event::Text(BytesText::new(
-                            &Self::escape_xml(&control.evidence),
-                        )))
+                        .write_event(Event::Text(BytesText::new(&Self::escape_xml(
+                            &control.evidence,
+                        ))))
                         .map_err(|e| ReportError::Serialize(e.to_string()))?;
                     writer
                         .write_event(Event::End(BytesEnd::new("failure")))
@@ -78,17 +80,15 @@ impl vallumix_core::profile::Reporter for JunitReporter {
                 }
                 "Error" => {
                     let mut error = BytesStart::new("error");
-                    error.push_attribute((
-                        "message",
-                        control.message.as_deref().unwrap_or("error"),
-                    ));
+                    error
+                        .push_attribute(("message", control.message.as_deref().unwrap_or("error")));
                     writer
                         .write_event(Event::Start(error))
                         .map_err(|e| ReportError::Serialize(e.to_string()))?;
                     writer
-                        .write_event(Event::Text(BytesText::new(
-                            &Self::escape_xml(&control.evidence),
-                        )))
+                        .write_event(Event::Text(BytesText::new(&Self::escape_xml(
+                            &control.evidence,
+                        ))))
                         .map_err(|e| ReportError::Serialize(e.to_string()))?;
                     writer
                         .write_event(Event::End(BytesEnd::new("error")))
@@ -108,8 +108,7 @@ impl vallumix_core::profile::Reporter for JunitReporter {
             .write_event(Event::End(BytesEnd::new("testsuite")))
             .map_err(|e| ReportError::Serialize(e.to_string()))?;
 
-        String::from_utf8(writer.into_inner())
-            .map_err(|e| ReportError::Serialize(e.to_string()))
+        String::from_utf8(writer.into_inner()).map_err(|e| ReportError::Serialize(e.to_string()))
     }
 }
 

@@ -2,8 +2,8 @@
 
 use std::collections::HashMap;
 
-pub mod control;
 pub mod context;
+pub mod control;
 pub mod distro;
 pub mod error;
 pub mod profile;
@@ -15,8 +15,6 @@ pub type ControlRegistry = HashMap<String, Box<dyn control::Control>>;
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
-
-    
 
     use crate::control::Control;
     use crate::distro::Distro;
@@ -62,7 +60,8 @@ mod tests {
     fn profile_web_toml_parses() {
         let path = workspace_root().join("profiles").join("web.toml");
         let content = std::fs::read_to_string(&path).expect("web.toml should exist");
-        let profile: crate::profile::Profile = toml::from_str(&content).expect("web.toml should parse");
+        let profile: crate::profile::Profile =
+            toml::from_str(&content).expect("web.toml should parse");
         assert_eq!(profile.name, "web");
         assert!(!profile.description.is_empty());
         assert!(!profile.controls.is_empty());
@@ -73,7 +72,8 @@ mod tests {
     fn profile_database_toml_parses() {
         let path = workspace_root().join("profiles").join("database.toml");
         let content = std::fs::read_to_string(&path).expect("database.toml should exist");
-        let profile: crate::profile::Profile = toml::from_str(&content).expect("database.toml should parse");
+        let profile: crate::profile::Profile =
+            toml::from_str(&content).expect("database.toml should parse");
         assert_eq!(profile.name, "database");
         assert!(!profile.description.is_empty());
         assert!(profile.controls.len() >= 20);
@@ -83,7 +83,8 @@ mod tests {
     fn profile_bastion_toml_parses() {
         let path = workspace_root().join("profiles").join("bastion.toml");
         let content = std::fs::read_to_string(&path).expect("bastion.toml should exist");
-        let profile: crate::profile::Profile = toml::from_str(&content).expect("bastion.toml should parse");
+        let profile: crate::profile::Profile =
+            toml::from_str(&content).expect("bastion.toml should parse");
         assert_eq!(profile.name, "bastion");
         assert!(!profile.description.is_empty());
         assert!(profile.controls.len() >= 25);

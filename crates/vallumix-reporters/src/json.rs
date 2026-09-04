@@ -12,8 +12,7 @@ impl JsonReporter {
 
 impl vallumix_core::profile::Reporter for JsonReporter {
     fn generate(&self, report: &Report) -> Result<String, ReportError> {
-        serde_json::to_string_pretty(report)
-            .map_err(|e| ReportError::Serialize(e.to_string()))
+        serde_json::to_string_pretty(report).map_err(|e| ReportError::Serialize(e.to_string()))
     }
 }
 

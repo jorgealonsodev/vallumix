@@ -40,10 +40,11 @@ impl vallumix_core::profile::Reporter for HtmlReporter {
             host: report.host.clone(),
             summary: report.summary.clone(),
             controls: report.controls.clone(),
-            timestamp: self
-                .timestamp
-                .clone()
-                .unwrap_or_else(|| chrono::Local::now().format("%Y-%m-%d %H:%M:%S %z").to_string()),
+            timestamp: self.timestamp.clone().unwrap_or_else(|| {
+                chrono::Local::now()
+                    .format("%Y-%m-%d %H:%M:%S %z")
+                    .to_string()
+            }),
         };
         tmpl.render()
             .map_err(|e| ReportError::Serialize(e.to_string()))

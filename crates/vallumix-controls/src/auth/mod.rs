@@ -3,8 +3,10 @@ pub mod common;
 use std::fs;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -26,37 +28,74 @@ impl Default for EnsureCronDaemon {
 }
 
 impl EnsureCronDaemon {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_paths(paths: Vec<PathBuf>) -> Self { EnsureCronDaemon { cron_paths: paths } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_paths(paths: Vec<PathBuf>) -> Self {
+        EnsureCronDaemon { cron_paths: paths }
+    }
 }
 
 impl Control for EnsureCronDaemon {
-    fn id(&self) -> &str { "5.1.1" }
-    fn description(&self) -> &str { "Ensure cron daemon is enabled" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.1.1"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure cron daemon is enabled"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let exists = self.cron_paths.iter().any(|p| p.exists());
         Ok(if exists {
-            CheckResult { status: CheckStatus::Compliant, evidence: "cron service found".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "cron service found".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "cron service not found".into(), message: Some("ensure cron is installed".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "cron service not found".into(),
+                message: Some("ensure cron is installed".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would enable cron".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would enable cron".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("cron enablement not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("cron enablement not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -66,43 +105,83 @@ pub struct EnsurePamPasswordQuality {
 
 impl Default for EnsurePamPasswordQuality {
     fn default() -> Self {
-        EnsurePamPasswordQuality { pam_path: PathBuf::from("/etc/pam.d/common-password") }
+        EnsurePamPasswordQuality {
+            pam_path: PathBuf::from("/etc/pam.d/common-password"),
+        }
     }
 }
 
 impl EnsurePamPasswordQuality {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(pam_path: PathBuf) -> Self { EnsurePamPasswordQuality { pam_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(pam_path: PathBuf) -> Self {
+        EnsurePamPasswordQuality { pam_path }
+    }
 }
 
 impl Control for EnsurePamPasswordQuality {
-    fn id(&self) -> &str { "5.3.1" }
-    fn description(&self) -> &str { "Ensure password quality checking is enabled" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.3.1"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure password quality checking is enabled"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.pam_path).unwrap_or_default();
-        let has_pwquality = content.contains("pam_pwquality.so") || content.contains("pam_cracklib.so");
+        let has_pwquality =
+            content.contains("pam_pwquality.so") || content.contains("pam_cracklib.so");
         Ok(if has_pwquality {
-            CheckResult { status: CheckStatus::Compliant, evidence: "password quality module found".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "password quality module found".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "password quality module missing".into(), message: Some("enable pam_pwquality".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "password quality module missing".into(),
+                message: Some("enable pam_pwquality".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure PAM".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure PAM".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("PAM configuration not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("PAM configuration not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -112,42 +191,83 @@ pub struct EnsurePamMinlen {
 
 impl Default for EnsurePamMinlen {
     fn default() -> Self {
-        EnsurePamMinlen { pwquality_path: PathBuf::from("/etc/security/pwquality.conf") }
+        EnsurePamMinlen {
+            pwquality_path: PathBuf::from("/etc/security/pwquality.conf"),
+        }
     }
 }
 
 impl EnsurePamMinlen {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(pwquality_path: PathBuf) -> Self { EnsurePamMinlen { pwquality_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(pwquality_path: PathBuf) -> Self {
+        EnsurePamMinlen { pwquality_path }
+    }
 }
 
 impl Control for EnsurePamMinlen {
-    fn id(&self) -> &str { "5.3.2" }
-    fn description(&self) -> &str { "Ensure password minimum length is configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.3.2"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure password minimum length is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.pwquality_path).unwrap_or_default();
         for line in content.lines() {
             if line.trim().starts_with("minlen") {
-                let val: i32 = line.split('=').nth(1).unwrap_or("0").trim().parse().unwrap_or(0);
+                let val: i32 = line
+                    .split('=')
+                    .nth(1)
+                    .unwrap_or("0")
+                    .trim()
+                    .parse()
+                    .unwrap_or(0);
                 if val >= 14 {
-                    return Ok(CheckResult { status: CheckStatus::Compliant, evidence: format!("minlen = {}", val), message: None });
+                    return Ok(CheckResult {
+                        status: CheckStatus::Compliant,
+                        evidence: format!("minlen = {}", val),
+                        message: None,
+                    });
                 } else {
-                    return Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("minlen = {} (expected >= 14)", val), message: Some("set minlen >= 14".into()) });
+                    return Ok(CheckResult {
+                        status: CheckStatus::NonCompliant,
+                        evidence: format!("minlen = {} (expected >= 14)", val),
+                        message: Some("set minlen >= 14".into()),
+                    });
                 }
             }
         }
-        Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "minlen not configured".into(), message: Some("set minlen >= 14".into()) })
+        Ok(CheckResult {
+            status: CheckStatus::NonCompliant,
+            evidence: "minlen not configured".into(),
+            message: Some("set minlen >= 14".into()),
+        })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would set minlen".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would set minlen".into()),
+            });
         }
         let content = fs::read_to_string(&self.pwquality_path).unwrap_or_default();
         let mut lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
@@ -158,13 +278,23 @@ impl Control for EnsurePamMinlen {
                 found = true;
             }
         }
-        if !found { lines.push("minlen = 14".to_string()); }
+        if !found {
+            lines.push("minlen = 14".to_string());
+        }
         fs::write(&self.pwquality_path, lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set minlen = 14".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set minlen = 14".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -174,41 +304,76 @@ pub struct EnsurePamCredit {
 
 impl Default for EnsurePamCredit {
     fn default() -> Self {
-        EnsurePamCredit { pwquality_path: PathBuf::from("/etc/security/pwquality.conf") }
+        EnsurePamCredit {
+            pwquality_path: PathBuf::from("/etc/security/pwquality.conf"),
+        }
     }
 }
 
 impl EnsurePamCredit {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(pwquality_path: PathBuf) -> Self { EnsurePamCredit { pwquality_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(pwquality_path: PathBuf) -> Self {
+        EnsurePamCredit { pwquality_path }
+    }
 }
 
 impl Control for EnsurePamCredit {
-    fn id(&self) -> &str { "5.3.3" }
-    fn description(&self) -> &str { "Ensure password complexity credits are configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.3.3"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure password complexity credits are configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.pwquality_path).unwrap_or_default();
         let mut missing = Vec::new();
         for name in ["dcredit", "ucredit", "lcredit", "ocredit"] {
-            let found = content.lines().any(|l| l.trim().starts_with(name) && l.contains("-1"));
-            if !found { missing.push(name); }
+            let found = content
+                .lines()
+                .any(|l| l.trim().starts_with(name) && l.contains("-1"));
+            if !found {
+                missing.push(name);
+            }
         }
         if missing.is_empty() {
-            Ok(CheckResult { status: CheckStatus::Compliant, evidence: "all credit parameters set to -1".into(), message: None })
+            Ok(CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "all credit parameters set to -1".into(),
+                message: None,
+            })
         } else {
-            Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("missing credits: {:?}", missing), message: Some("set all credit params to -1".into()) })
+            Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: format!("missing credits: {:?}", missing),
+                message: Some("set all credit params to -1".into()),
+            })
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would set credits".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would set credits".into()),
+            });
         }
         let content = fs::read_to_string(&self.pwquality_path).unwrap_or_default();
         let mut lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
@@ -220,14 +385,24 @@ impl Control for EnsurePamCredit {
                     found = true;
                 }
             }
-            if !found { lines.push(format!("{} = -1", name)); }
+            if !found {
+                lines.push(format!("{} = -1", name));
+            }
         }
         fs::write(&self.pwquality_path, lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set credit parameters".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set credit parameters".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -237,43 +412,82 @@ pub struct EnsurePamFaillock {
 
 impl Default for EnsurePamFaillock {
     fn default() -> Self {
-        EnsurePamFaillock { pam_path: PathBuf::from("/etc/pam.d/common-auth") }
+        EnsurePamFaillock {
+            pam_path: PathBuf::from("/etc/pam.d/common-auth"),
+        }
     }
 }
 
 impl EnsurePamFaillock {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(pam_path: PathBuf) -> Self { EnsurePamFaillock { pam_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(pam_path: PathBuf) -> Self {
+        EnsurePamFaillock { pam_path }
+    }
 }
 
 impl Control for EnsurePamFaillock {
-    fn id(&self) -> &str { "5.3.4" }
-    fn description(&self) -> &str { "Ensure PAM faillock is configured" }
-    fn severity(&self) -> Severity { Severity::High }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.3.4"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure PAM faillock is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::High
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.pam_path).unwrap_or_default();
         let has_faillock = content.contains("pam_faillock.so");
         Ok(if has_faillock {
-            CheckResult { status: CheckStatus::Compliant, evidence: "pam_faillock configured".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "pam_faillock configured".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "pam_faillock not configured".into(), message: Some("configure pam_faillock".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "pam_faillock not configured".into(),
+                message: Some("configure pam_faillock".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure faillock".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure faillock".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("faillock configuration not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("faillock configuration not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -283,43 +497,82 @@ pub struct EnsurePamRemember {
 
 impl Default for EnsurePamRemember {
     fn default() -> Self {
-        EnsurePamRemember { pam_path: PathBuf::from("/etc/pam.d/common-password") }
+        EnsurePamRemember {
+            pam_path: PathBuf::from("/etc/pam.d/common-password"),
+        }
     }
 }
 
 impl EnsurePamRemember {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(pam_path: PathBuf) -> Self { EnsurePamRemember { pam_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(pam_path: PathBuf) -> Self {
+        EnsurePamRemember { pam_path }
+    }
 }
 
 impl Control for EnsurePamRemember {
-    fn id(&self) -> &str { "5.3.5" }
-    fn description(&self) -> &str { "Ensure password history is configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.3.5"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure password history is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.pam_path).unwrap_or_default();
         let has_remember = content.contains("remember=");
         Ok(if has_remember {
-            CheckResult { status: CheckStatus::Compliant, evidence: "password remember found".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "password remember found".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "password remember not configured".into(), message: Some("add remember=5 to pam_unix".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "password remember not configured".into(),
+                message: Some("add remember=5 to pam_unix".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure remember".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure remember".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("remember configuration not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("remember configuration not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -329,37 +582,71 @@ pub struct EnsurePasswordHashing {
 
 impl Default for EnsurePasswordHashing {
     fn default() -> Self {
-        EnsurePasswordHashing { login_defs_path: PathBuf::from("/etc/login.defs") }
+        EnsurePasswordHashing {
+            login_defs_path: PathBuf::from("/etc/login.defs"),
+        }
     }
 }
 
 impl EnsurePasswordHashing {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(login_defs_path: PathBuf) -> Self { EnsurePasswordHashing { login_defs_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(login_defs_path: PathBuf) -> Self {
+        EnsurePasswordHashing { login_defs_path }
+    }
 }
 
 impl Control for EnsurePasswordHashing {
-    fn id(&self) -> &str { "5.4.1" }
-    fn description(&self) -> &str { "Ensure password hashing algorithm is SHA512 or yescrypt" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.4.1"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure password hashing algorithm is SHA512 or yescrypt"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.login_defs_path).unwrap_or_default();
-        let ok = content.lines().any(|l| l.trim().starts_with("ENCRYPT_METHOD") && (l.contains("SHA512") || l.contains("yescrypt")));
+        let ok = content.lines().any(|l| {
+            l.trim().starts_with("ENCRYPT_METHOD")
+                && (l.contains("SHA512") || l.contains("yescrypt"))
+        });
         Ok(if ok {
-            CheckResult { status: CheckStatus::Compliant, evidence: "password hashing method OK".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "password hashing method OK".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "password hashing method not SHA512/yescrypt".into(), message: Some("set ENCRYPT_METHOD SHA512 or yescrypt".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "password hashing method not SHA512/yescrypt".into(),
+                message: Some("set ENCRYPT_METHOD SHA512 or yescrypt".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would set ENCRYPT_METHOD".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would set ENCRYPT_METHOD".into()),
+            });
         }
         let content = fs::read_to_string(&self.login_defs_path).unwrap_or_default();
         let mut lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
@@ -370,13 +657,23 @@ impl Control for EnsurePasswordHashing {
                 found = true;
             }
         }
-        if !found { lines.push("ENCRYPT_METHOD SHA512".to_string()); }
+        if !found {
+            lines.push("ENCRYPT_METHOD SHA512".to_string());
+        }
         fs::write(&self.login_defs_path, lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set ENCRYPT_METHOD SHA512".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set ENCRYPT_METHOD SHA512".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -395,20 +692,38 @@ impl Default for EnsureUmask {
 }
 
 impl EnsureUmask {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
     pub fn with_paths(profile_path: PathBuf, bashrc_path: PathBuf) -> Self {
-        EnsureUmask { profile_path, bashrc_path }
+        EnsureUmask {
+            profile_path,
+            bashrc_path,
+        }
     }
 }
 
 impl Control for EnsureUmask {
-    fn id(&self) -> &str { "5.5.1" }
-    fn description(&self) -> &str { "Ensure default user umask is 0077 or more restrictive" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.5.1"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure default user umask is 0077 or more restrictive"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.profile_path).unwrap_or_default();
@@ -423,18 +738,34 @@ impl Control for EnsureUmask {
             Some(v) => {
                 let val = u32::from_str_radix(&v, 8).unwrap_or(22);
                 if val >= 0o77 {
-                    Ok(CheckResult { status: CheckStatus::Compliant, evidence: format!("umask = {:03o}", val), message: None })
+                    Ok(CheckResult {
+                        status: CheckStatus::Compliant,
+                        evidence: format!("umask = {:03o}", val),
+                        message: None,
+                    })
                 } else {
-                    Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("umask = {:03o} (too permissive)", val), message: Some("set umask 0077".into()) })
+                    Ok(CheckResult {
+                        status: CheckStatus::NonCompliant,
+                        evidence: format!("umask = {:03o} (too permissive)", val),
+                        message: Some("set umask 0077".into()),
+                    })
                 }
             }
-            None => Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "umask not set in /etc/profile".into(), message: Some("set umask 0077".into()) }),
+            None => Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "umask not set in /etc/profile".into(),
+                message: Some("set umask 0077".into()),
+            }),
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would set umask".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would set umask".into()),
+            });
         }
         for path in [&self.profile_path, &self.bashrc_path] {
             let content = fs::read_to_string(path).unwrap_or_default();
@@ -446,14 +777,24 @@ impl Control for EnsureUmask {
                     found = true;
                 }
             }
-            if !found { lines.push("umask 0077".to_string()); }
+            if !found {
+                lines.push("umask 0077".to_string());
+            }
             fs::write(path, lines.join("\n"))?;
         }
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set umask 0077".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set umask 0077".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -463,42 +804,80 @@ pub struct EnsureShellTimeout {
 
 impl Default for EnsureShellTimeout {
     fn default() -> Self {
-        EnsureShellTimeout { profile_path: PathBuf::from("/etc/profile") }
+        EnsureShellTimeout {
+            profile_path: PathBuf::from("/etc/profile"),
+        }
     }
 }
 
 impl EnsureShellTimeout {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(profile_path: PathBuf) -> Self { EnsureShellTimeout { profile_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(profile_path: PathBuf) -> Self {
+        EnsureShellTimeout { profile_path }
+    }
 }
 
 impl Control for EnsureShellTimeout {
-    fn id(&self) -> &str { "5.5.2" }
-    fn description(&self) -> &str { "Ensure shell timeout is configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "5.5.2"
     }
-    fn category(&self) -> Category { Category::Auth }
+    fn description(&self) -> &str {
+        "Ensure shell timeout is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Auth
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.profile_path).unwrap_or_default();
         let mut tmout = None;
         for line in content.lines() {
             if line.trim().starts_with("TMOUT") {
-                tmout = line.split('=').nth(1).and_then(|s| s.trim().parse::<u32>().ok());
+                tmout = line
+                    .split('=')
+                    .nth(1)
+                    .and_then(|s| s.trim().parse::<u32>().ok());
             }
         }
         match tmout {
-            Some(v) if v <= 300 => Ok(CheckResult { status: CheckStatus::Compliant, evidence: format!("TMOUT = {}", v), message: None }),
-            Some(v) => Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("TMOUT = {} (too high)", v), message: Some("set TMOUT <= 300".into()) }),
-            None => Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "TMOUT not set".into(), message: Some("set TMOUT=300".into()) }),
+            Some(v) if v <= 300 => Ok(CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: format!("TMOUT = {}", v),
+                message: None,
+            }),
+            Some(v) => Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: format!("TMOUT = {} (too high)", v),
+                message: Some("set TMOUT <= 300".into()),
+            }),
+            None => Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "TMOUT not set".into(),
+                message: Some("set TMOUT=300".into()),
+            }),
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would set TMOUT".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would set TMOUT".into()),
+            });
         }
         let content = fs::read_to_string(&self.profile_path).unwrap_or_default();
         let mut lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
@@ -509,13 +888,23 @@ impl Control for EnsureShellTimeout {
                 found = true;
             }
         }
-        if !found { lines.push("TMOUT=300".to_string()); }
+        if !found {
+            lines.push("TMOUT=300".to_string());
+        }
         fs::write(&self.profile_path, lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set TMOUT=300".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set TMOUT=300".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[cfg(test)]
@@ -538,7 +927,8 @@ mod tests {
 
     #[test]
     fn ensure_cron_daemon_check_compliant_when_unit_absent() {
-        let ctrl = EnsureCronDaemon::with_paths(vec![PathBuf::from("/tmp/nonexistent-cron-service")]);
+        let ctrl =
+            EnsureCronDaemon::with_paths(vec![PathBuf::from("/tmp/nonexistent-cron-service")]);
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
         assert!(result.evidence.contains("not found"));
@@ -730,8 +1120,12 @@ mod tests {
         let ctrl = EnsureUmask::with_paths(ctx.profile_path(), ctx.bashrc_path());
         let result = ctrl.apply(&test_ctx(false)).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
-        assert!(std::fs::read_to_string(ctx.profile_path()).unwrap().contains("umask 0077"));
-        assert!(std::fs::read_to_string(ctx.bashrc_path()).unwrap().contains("umask 0077"));
+        assert!(std::fs::read_to_string(ctx.profile_path())
+            .unwrap()
+            .contains("umask 0077"));
+        assert!(std::fs::read_to_string(ctx.bashrc_path())
+            .unwrap()
+            .contains("umask 0077"));
     }
 
     #[test]
