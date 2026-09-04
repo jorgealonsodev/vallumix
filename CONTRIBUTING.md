@@ -6,7 +6,7 @@ Thank you for your interest in contributing to Vallumix! This document outlines 
 
 ### Prerequisites
 
-- **Rust toolchain** 1.75 or newer (install via [rustup](https://rustup.rs/))
+- **Rust toolchain** 1.85 or newer (install via [rustup](https://rustup.rs/)). The repository pins an exact version in `rust-toolchain.toml`; rustup honours it automatically.
 - `cargo`, `rustfmt`, and `clippy` (included with rustup)
 - Optional but recommended: `cargo-tarpaulin`, `cargo-release`
 
