@@ -38,7 +38,7 @@ jobs:
 
       - name: Install Rust toolchain
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Verify toolchain
@@ -76,7 +76,7 @@ jobs:
 
       - name: Install Rust toolchain
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Install cross
@@ -105,7 +105,7 @@ jobs:
 
       - name: Install Rust toolchain
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Install cargo-tarpaulin
@@ -139,7 +139,7 @@ jobs:
 
       - name: Install Rust toolchain
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Install cargo-deny
@@ -156,7 +156,7 @@ jobs:
 
       - name: Install Rust toolchain
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Install cargo-audit
@@ -173,7 +173,7 @@ jobs:
 
       - name: Install Rust toolchain
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Cache cargo registry
