@@ -9,3 +9,5 @@
 .atl/
 .windsurf/
 man/*.1
+completions/vallumix.bash
+completions/_vallumix
