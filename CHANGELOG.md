@@ -8,13 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Debian and RPM packages now install the `web`, `database` and `bastion`
-  profiles to `/etc/vallumix/profiles/`, marked as configuration files so a
-  package upgrade does not overwrite host edits. Without them the installed
-  binary could not run `audit` or `apply` at all.
-- An end-to-end smoke test (`scripts/smoke-test.sh`, run in CI) that installs
-  the built package into a container and drives the real binary. The unit
-  suite cannot see packaging, profile installation or the wiring in `main.rs`.
+- Placeholder for upcoming features and improvements.
 
 ### Changed
 
@@ -30,6 +24,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Placeholder for bug fixes.
+
+### Security
+
+- Placeholder for security-related changes.
+
+## [1.2.0] - 2026-09-04
+
+
+### Added
+
+- Debian and RPM packages now install the `web`, `database` and `bastion`
+  profiles to `/etc/vallumix/profiles/`, marked as configuration files so a
+  package upgrade does not overwrite host edits. Without them the installed
+  binary could not run `audit` or `apply` at all.
+- An end-to-end smoke test (`scripts/smoke-test.sh`, run in CI) that installs
+  the built package into a container and drives the real binary. The unit
+  suite cannot see packaging, profile installation or the wiring in `main.rs`.
+
+### Fixed
+
 - `audit` and `apply` now detect the running distribution instead of assuming
   Debian 12. Detection existed and was unit-tested but was never called, so
   every report claimed `debian/12` whatever the host.
@@ -42,10 +57,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `audit` and `apply` print a text report by default. Output was gated behind
   `--report`, so a plain `vallumix audit` produced nothing. `--quiet` still
   suppresses it and `--report text` still prints exactly once.
-
-### Security
-
-- Placeholder for security-related changes.
 
 ## [1.1.0] - 2026-09-04
 
