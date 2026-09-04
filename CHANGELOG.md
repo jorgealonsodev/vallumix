@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Placeholder for upcoming features and improvements.
+- Debian and RPM packages now install the `web`, `database` and `bastion`
+  profiles to `/etc/vallumix/profiles/`, marked as configuration files so a
+  package upgrade does not overwrite host edits. Without them the installed
+  binary could not run `audit` or `apply` at all.
+- An end-to-end smoke test (`scripts/smoke-test.sh`, run in CI) that installs
+  the built package into a container and drives the real binary. The unit
+  suite cannot see packaging, profile installation or the wiring in `main.rs`.
 
 ### Changed
 
@@ -24,7 +30,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- Placeholder for bug fixes.
+- `audit` and `apply` now detect the running distribution instead of assuming
+  Debian 12. Detection existed and was unit-tested but was never called, so
+  every report claimed `debian/12` whatever the host.
+- Ubuntu and Debian derivatives are now recognised through `ID_LIKE` and
+  `UBUNTU_CODENAME`. Linux Mint 22.3, for instance, resolves to Ubuntu 24.04.
+  A derivative on an unrecognised base is still rejected rather than guessed.
+- Errors reaching the top level are printed instead of discarded. Every
+  command ended in `.unwrap_or(2)`, so a failure produced a bare exit code 2
+  with no output at all — including the common case of a missing profile.
+- `audit` and `apply` print a text report by default. Output was gated behind
+  `--report`, so a plain `vallumix audit` produced nothing. `--quiet` still
+  suppresses it and `--report text` still prints exactly once.
 
 ### Security
 

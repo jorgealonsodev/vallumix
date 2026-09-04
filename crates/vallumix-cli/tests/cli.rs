@@ -218,3 +218,88 @@ fn cli_completion_nushell() {
         .failure()
         .stderr(predicate::str::contains("invalid value 'nushell'"));
 }
+
+#[test]
+fn cli_audit_prints_a_report_without_the_report_flag() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Vallumix Compliance Report"))
+        .stdout(predicate::str::contains("Compliance Rate"));
+}
+
+#[test]
+fn cli_audit_quiet_prints_no_report() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("--quiet")
+        .arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert().success().stdout(predicate::str::is_empty());
+}
+
+#[test]
+fn cli_audit_text_report_is_printed_once() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("text")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    let output = cmd.output().unwrap();
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let headers = stdout.matches("Vallumix Compliance Report").count();
+    assert_eq!(
+        headers, 1,
+        "the human report was printed {} time(s)",
+        headers
+    );
+}
+
+#[test]
+fn cli_audit_missing_profile_explains_itself() {
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .env("VALLUMIX_PROFILE_DIR", "/nonexistent");
+    cmd.assert()
+        .failure()
+        .code(2)
+        .stderr(predicate::str::contains("profile not found"));
+}
+
+#[test]
+fn cli_audit_report_names_the_running_distro() {
+    let distro = match vallumix_core::distro::detect() {
+        Ok(distro) => distro,
+        Err(e) => {
+            eprintln!("skipping: this host is not a supported distribution ({e})");
+            return;
+        }
+    };
+    let mut cmd = Command::cargo_bin("vallumix").unwrap();
+    cmd.arg("audit")
+        .arg("--profile")
+        .arg("web")
+        .arg("--report")
+        .arg("text")
+        .arg("--threshold")
+        .arg("0")
+        .env("VALLUMIX_PROFILE_DIR", profile_dir());
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains(distro.to_string()));
+}

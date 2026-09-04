@@ -23,6 +23,15 @@ fn check_privileges() -> bool {
     nix::unistd::geteuid().is_root()
 }
 
+/// Prints a failed command's cause to stderr and yields the error exit code.
+///
+/// `{:#}` renders the whole `anyhow` chain, so the underlying reason (a missing
+/// profile, an unreadable file) reaches the user instead of a bare exit code.
+fn report_error(err: anyhow::Error) -> i32 {
+    eprintln!("{} {:#}", "Error:".red().bold(), err);
+    2
+}
+
 #[allow(dead_code)]
 fn compute_exit_code(compliance_rate: f64, threshold: u8) -> i32 {
     if compliance_rate >= threshold as f64 {
@@ -60,7 +69,7 @@ fn main() {
                 cli.output.as_deref(),
                 cli.quiet,
             )
-            .unwrap_or(2)
+            .unwrap_or_else(report_error)
         }
         Commands::Audit => commands::audit::run(
             &cli.profile,
@@ -69,13 +78,16 @@ fn main() {
             cli.output.as_deref(),
             cli.quiet,
         )
-        .unwrap_or(2),
+        .unwrap_or_else(report_error),
         Commands::Rollback {
             control_id,
             session,
-        } => commands::rollback::run(control_id.clone(), session.clone()).unwrap_or(2),
-        Commands::List => commands::list::run().unwrap_or(2),
-        Commands::Completion { shell } => commands::completion::run(*shell).unwrap_or(2),
+        } => commands::rollback::run(control_id.clone(), session.clone())
+            .unwrap_or_else(report_error),
+        Commands::List => commands::list::run().unwrap_or_else(report_error),
+        Commands::Completion { shell } => {
+            commands::completion::run(*shell).unwrap_or_else(report_error)
+        }
     };
 
     std::process::exit(exit_code);

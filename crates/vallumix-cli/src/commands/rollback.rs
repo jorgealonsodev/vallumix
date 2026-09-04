@@ -1,10 +1,10 @@
 use anyhow::Result;
 use vallumix_backup::BackupManager;
 use vallumix_core::context::Context;
-use vallumix_core::distro::Distro;
+use vallumix_core::distro;
 
 pub fn run(control_id: Option<String>, session_id: Option<String>) -> Result<i32> {
-    let distro = Distro::Debian12; // TODO: detect
+    let distro = distro::detect()?;
     let ctx = Context::new(distro)?;
     let backup_mgr = BackupManager::new(&ctx.backup_dir);
 
