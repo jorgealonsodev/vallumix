@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        run: rustup show
 
       - name: Build release binary
         run: cargo build --release -p vallumix-cli

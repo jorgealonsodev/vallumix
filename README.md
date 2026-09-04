@@ -5,7 +5,7 @@
 [![crates.io](https://img.shields.io/crates/v/vallumix.svg)](https://crates.io/crates/vallumix)
 [![docs.rs](https://docs.rs/vallumix/badge.svg)](https://docs.rs/vallumix)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-MIT)
-[![MSRV](https://img.shields.io/badge/MSRV-1.75-orange.svg)](https://blog.rust-lang.org/2023/12/28/Rust-1.75.0.html)
+[![MSRV](https://img.shields.io/badge/MSRV-1.85-orange.svg)](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0.html)
 
 <p align="center">
   <img src="img/valumix.png" alt="Vallumix" width="600">
