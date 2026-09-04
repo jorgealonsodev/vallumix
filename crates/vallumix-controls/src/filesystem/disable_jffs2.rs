@@ -81,7 +81,7 @@ mod tests {
     #[test]
     fn check_compliant_when_absent() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\tsquashfs\n").unwrap();
+        writeln!(tmp, "nodev\tsquashfs").unwrap();
         let ctrl = DisableJffs2::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Compliant);
     }
@@ -89,7 +89,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_present() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "nodev\tjffs2\n").unwrap();
+        writeln!(tmp, "nodev\tjffs2").unwrap();
         let ctrl = DisableJffs2::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::NonCompliant);
     }

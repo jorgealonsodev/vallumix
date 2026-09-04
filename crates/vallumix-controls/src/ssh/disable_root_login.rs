@@ -1,5 +1,4 @@
 use std::fs;
-use std::io::Write;
 use std::path::PathBuf;
 
 use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
@@ -143,7 +142,7 @@ mod tests {
     #[test]
     fn check_compliant_when_permit_root_login_no() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "PermitRootLogin no\n").unwrap();
+        writeln!(tmp, "PermitRootLogin no").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
         let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
         let result = ctrl.check(&ctx).unwrap();
@@ -153,7 +152,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_permit_root_login_yes() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "PermitRootLogin yes\n").unwrap();
+        writeln!(tmp, "PermitRootLogin yes").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
         let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
         let result = ctrl.check(&ctx).unwrap();
@@ -163,7 +162,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_missing() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "Port 22\n").unwrap();
+        writeln!(tmp, "Port 22").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
         let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
         let result = ctrl.check(&ctx).unwrap();
@@ -186,7 +185,7 @@ mod tests {
     #[test]
     fn apply_adds_directive_when_missing() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "Port 22\n").unwrap();
+        writeln!(tmp, "Port 22").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
         let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
         let result = ctrl.apply(&ctx).unwrap();

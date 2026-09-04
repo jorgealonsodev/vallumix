@@ -120,7 +120,7 @@ mod tests {
     #[test]
     fn check_compliant_when_ip_forward_0() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "0\n").unwrap();
+        writeln!(tmp, "0").unwrap();
         let ctrl = SysctlIpForwarding::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
         let result = ctrl.check(&ctx).unwrap();
@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn check_non_compliant_when_ip_forward_1() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "1\n").unwrap();
+        writeln!(tmp, "1").unwrap();
         let ctrl = SysctlIpForwarding::with_paths(tmp.path().into(), tmp.path().parent().unwrap().into());
         let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
         let result = ctrl.check(&ctx).unwrap();

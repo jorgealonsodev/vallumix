@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use chrono::Utc;
 use indicatif::{ProgressBar, ProgressStyle};
-use vallumix_core::control::{ApplyStatus, CheckStatus, Control};
+use vallumix_core::control::{ApplyStatus, CheckStatus};
 use vallumix_core::context::Context;
 use vallumix_core::distro::Distro;
 use vallumix_core::profile::{ControlReport, Profile, Reporter};
@@ -177,9 +177,11 @@ pub fn run(
 mod tests {
     use super::*;
 
+    type ApplyFn = fn(&str, bool, u8, Option<Vec<String>>, Option<&Path>, bool) -> Result<i32>;
+
     #[test]
     fn apply_command_signature_exists() {
-        let _f: fn(&str, bool, u8, Option<Vec<String>>, Option<&Path>, bool) -> Result<i32> = run;
+        let _f: ApplyFn = run;
     }
 
     #[test]

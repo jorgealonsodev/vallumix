@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn compliant_with_allowusers() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "AllowUsers admin\n").unwrap();
+        writeln!(tmp, "AllowUsers admin").unwrap();
         let ctrl = SshLimitAccess::with_path(tmp.path().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::Compliant);
     }
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn non_compliant_without() {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
-        write!(tmp, "Port 22\n").unwrap();
+        writeln!(tmp, "Port 22").unwrap();
         let ctrl = SshLimitAccess::with_path(tmp.path().into());
         assert_eq!(ctrl.check(&ctx()).unwrap().status, CheckStatus::NonCompliant);
     }

@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
-use vallumix_core::control::{CheckStatus, Control};
+use vallumix_core::control::CheckStatus;
 use vallumix_core::context::Context;
 use vallumix_core::distro::Distro;
 use vallumix_core::profile::{ControlReport, Profile, Reporter};
@@ -131,9 +131,11 @@ pub fn run(
 mod tests {
     use super::*;
 
+    type AuditFn = fn(&str, u8, Option<Vec<String>>, Option<&Path>, bool) -> Result<i32>;
+
     #[test]
     fn audit_command_signature_exists() {
-        let _f: fn(&str, u8, Option<Vec<String>>, Option<&Path>, bool) -> Result<i32> = run;
+        let _f: AuditFn = run;
     }
 
     #[test]

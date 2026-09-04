@@ -66,7 +66,7 @@ impl SshdConfigControl {
                 continue;
             }
             if let Some(rest) = trimmed.strip_prefix(self.directive) {
-                let value = rest.trim().trim_start_matches(|c| c == ' ' || c == '=' || c == '\t');
+                let value = rest.trim().trim_start_matches([' ', '=', '\t']);
                 return Some(value.into());
             }
         }

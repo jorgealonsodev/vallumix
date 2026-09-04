@@ -194,8 +194,7 @@ mod tests {
             evidence: "ok".into(),
             message: None,
         });
-        let _err: ControlResult = Err(ControlError::Io(std::io::Error::new(
-            std::io::ErrorKind::Other,
+        let _err: ControlResult = Err(ControlError::Io(std::io::Error::other(
             "test",
         )));
     }

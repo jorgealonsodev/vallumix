@@ -15,6 +15,12 @@ macro_rules! def_sysctl_control {
             }
         }
 
+        impl Default for $name {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
         impl vallumix_core::control::Control for $name {
             fn id(&self) -> &str { self.0.id() }
             fn description(&self) -> &str { self.0.description() }
@@ -131,11 +137,11 @@ pub mod configure_firewalld;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::common::SysctlControl;
+    
     use vallumix_core::control::Control;
     use vallumix_core::context::Context;
     use vallumix_core::distro::Distro;
-    use std::path::PathBuf;
+    
 
     fn test_ctx(dry_run: bool) -> Context {
         Context::with_paths(
@@ -153,10 +159,10 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/all")).unwrap();
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/all/send_redirects"), "0\n").unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "0\n").unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
 
         let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -168,10 +174,10 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/all")).unwrap();
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/all/send_redirects"), "1\n").unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "1\n").unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
 
         let ctrl = sysctl_disable_send_redirects::SysctlDisableSendRedirects::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -199,10 +205,10 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/all")).unwrap();
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/all/accept_source_route"), "0\n").unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/default/accept_source_route"), "0\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/all/accept_source_route"), "0\n").unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/default/accept_source_route"), "0\n").unwrap();
 
         let ctrl = sysctl_disable_source_route::SysctlDisableSourceRoute::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -230,10 +236,10 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/all")).unwrap();
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4/conf/default")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/all/rp_filter"), "1\n").unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/conf/default/rp_filter"), "1\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/all/rp_filter"), "1\n").unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/conf/default/rp_filter"), "1\n").unwrap();
 
         let ctrl = sysctl_enable_rp_filter::SysctlEnableRpFilter::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -245,8 +251,8 @@ mod tests {
         let tmpdir = tempfile::tempdir().unwrap();
         let proc_prefix = tmpdir.path().join("proc");
         let sysctl_dir = tmpdir.path().join("sysctl.d");
-        std::fs::create_dir_all(&proc_prefix.join("net/ipv4")).unwrap();
-        std::fs::write(&proc_prefix.join("net/ipv4/tcp_syncookies"), "1\n").unwrap();
+        std::fs::create_dir_all(proc_prefix.join("net/ipv4")).unwrap();
+        std::fs::write(proc_prefix.join("net/ipv4/tcp_syncookies"), "1\n").unwrap();
 
         let ctrl = sysctl_enable_syncookies::SysctlEnableSyncookies::with_paths(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
