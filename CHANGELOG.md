@@ -19,6 +19,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `DisableAvahi` carries its systemd unit search paths as a field, with a
   `with_all_paths()` constructor mirroring `ServiceDisable`. Production
   behavior is unchanged.
+- Pinned the Rust toolchain to 1.98.1 instead of tracking unpinned `stable`.
+  New compiler and clippy releases now arrive as a deliberate, reviewable bump
+  rather than as a surprise CI failure.
+- Corrected the declared MSRV from 1.75 to 1.85. The 1.75 claim was already
+  false: the dependency tree requires at least 1.85. Verified by building and
+  running the full test suite on 1.85.0.
 - Updated dependencies, superseding the open Dependabot pull requests:
   `nix` 0.27 -> 0.31, `clap_mangen` 0.2 -> 0.3, `clap_complete` 4.6.3 -> 4.6.7,
   `insta` 1.47.2 -> 1.48.0, `chrono` 0.4.44 -> 0.4.45, `serde_json` 1.0.149 ->

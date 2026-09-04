@@ -20,7 +20,7 @@ description = "Vallumix — CIS Linux hardening and compliance toolkit"
 keywords = ["cis", "linux", "hardening", "compliance", "security"]
 categories = ["command-line-utilities"]
 publish = false
-rust-version = "1.75"
+rust-version = "1.85"
 
 [workspace.dependencies]
 clap = { version = "4.5", features = ["derive"] }
