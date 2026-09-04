@@ -1,8 +1,10 @@
 use std::fs;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -75,36 +77,85 @@ impl SshdConfigControl {
 }
 
 impl Control for SshdConfigControl {
-    fn id(&self) -> &str { self.id }
-    fn description(&self) -> &str { self.description }
-    fn severity(&self) -> Severity { self.severity }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        self.id
     }
-    fn category(&self) -> Category { Category::Ssh }
+    fn description(&self) -> &str {
+        self.description
+    }
+    fn severity(&self) -> Severity {
+        self.severity
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Ssh
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         match self.find_value() {
             Some(value) => {
-                if self.expected_values.iter().any(|&ev| ev.eq_ignore_ascii_case(&value)) {
-                    Ok(CheckResult { status: CheckStatus::Compliant, evidence: format!("{} {}", self.directive, value), message: None })
+                if self
+                    .expected_values
+                    .iter()
+                    .any(|&ev| ev.eq_ignore_ascii_case(&value))
+                {
+                    Ok(CheckResult {
+                        status: CheckStatus::Compliant,
+                        evidence: format!("{} {}", self.directive, value),
+                        message: None,
+                    })
                 } else {
-                    Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("{} {} (expected one of: {:?})", self.directive, value, self.expected_values), message: Some(format!("{} should be set to {}", self.directive, self.apply_value)) })
+                    Ok(CheckResult {
+                        status: CheckStatus::NonCompliant,
+                        evidence: format!(
+                            "{} {} (expected one of: {:?})",
+                            self.directive, value, self.expected_values
+                        ),
+                        message: Some(format!(
+                            "{} should be set to {}",
+                            self.directive, self.apply_value
+                        )),
+                    })
                 }
             }
             None => {
                 // Some directives (like Protocol) default to safe values
                 if self.directive == "Protocol" {
-                    return Ok(CheckResult { status: CheckStatus::Compliant, evidence: "Protocol defaults to 2".into(), message: None });
+                    return Ok(CheckResult {
+                        status: CheckStatus::Compliant,
+                        evidence: "Protocol defaults to 2".into(),
+                        message: None,
+                    });
                 }
-                Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("{} not found", self.directive), message: Some(format!("{} should be explicitly set to {}", self.directive, self.apply_value)) })
+                Ok(CheckResult {
+                    status: CheckStatus::NonCompliant,
+                    evidence: format!("{} not found", self.directive),
+                    message: Some(format!(
+                        "{} should be explicitly set to {}",
+                        self.directive, self.apply_value
+                    )),
+                })
             }
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some(format!("dry-run: would set {} {}", self.directive, self.apply_value)) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some(format!(
+                    "dry-run: would set {} {}",
+                    self.directive, self.apply_value
+                )),
+            });
         }
         let content = fs::read_to_string(&self.sshd_config_path).unwrap_or_default();
         let mut found = false;
@@ -122,7 +173,11 @@ impl Control for SshdConfigControl {
             new_lines.push(format!("{} {}", self.directive, self.apply_value));
         }
         fs::write(&self.sshd_config_path, new_lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some(format!("set {} {}", self.directive, self.apply_value)) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some(format!("set {} {}", self.directive, self.apply_value)),
+        })
     }
 
     fn rollback(&self, _ctx: &Context, backup: &Backup) -> Result<(), ControlError> {
@@ -132,7 +187,9 @@ impl Control for SshdConfigControl {
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[cfg(test)]
@@ -177,8 +234,13 @@ mod tests {
         make_sshd_config(&config, "Port 22\nProtocol 2\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config.clone(), "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config.clone(),
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         assert_eq!(ctrl.find_value(), Some("2".into()));
     }
@@ -190,8 +252,13 @@ mod tests {
         make_sshd_config(&config, "# Protocol 1\n\nProtocol 2\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config, "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config,
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         assert_eq!(ctrl.find_value(), Some("2".into()));
     }
@@ -203,8 +270,13 @@ mod tests {
         make_sshd_config(&config, "Port 22\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config, "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config,
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         assert_eq!(ctrl.find_value(), None);
     }
@@ -216,8 +288,13 @@ mod tests {
         make_sshd_config(&config, "Protocol 2\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config, "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config,
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
@@ -231,8 +308,13 @@ mod tests {
         make_sshd_config(&config, "Port 22\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config, "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config,
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
@@ -246,8 +328,13 @@ mod tests {
         make_sshd_config(&config, "Protocol 1\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config, "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config,
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
@@ -261,8 +348,13 @@ mod tests {
         make_sshd_config(&config, "Port 22\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.4", "desc", Severity::Low, config, "PermitRootLogin",
-            vec!["no"], "no",
+            "5.2.4",
+            "desc",
+            Severity::Low,
+            config,
+            "PermitRootLogin",
+            vec!["no"],
+            "no",
         );
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
@@ -276,8 +368,13 @@ mod tests {
         make_sshd_config(&config, "Protocol 1\nPort 22\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config.clone(), "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config.clone(),
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let result = ctrl.apply(&test_ctx(false)).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
@@ -294,8 +391,13 @@ mod tests {
         make_sshd_config(&config, "Port 22\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config.clone(), "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config.clone(),
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let result = ctrl.apply(&test_ctx(false)).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
@@ -311,8 +413,13 @@ mod tests {
         make_sshd_config(&config, "Protocol 1\n");
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config.clone(), "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config.clone(),
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let result = ctrl.apply(&test_ctx(true)).unwrap();
         assert_eq!(result.status, ApplyStatus::Skipped);
@@ -330,8 +437,13 @@ mod tests {
         std::fs::write(&backup, "original").unwrap();
 
         let ctrl = SshdConfigControl::with_path(
-            "5.2.1", "desc", Severity::Low, config.clone(), "Protocol",
-            vec!["2"], "2",
+            "5.2.1",
+            "desc",
+            Severity::Low,
+            config.clone(),
+            "Protocol",
+            vec!["2"],
+            "2",
         );
         let b = vallumix_core::profile::Backup {
             id: "b".into(),
@@ -345,7 +457,8 @@ mod tests {
 
     #[test]
     fn clone_box_produces_identical_control() {
-        let ctrl = SshdConfigControl::new("5.2.1", "desc", Severity::Low, "Protocol", vec!["2"], "2");
+        let ctrl =
+            SshdConfigControl::new("5.2.1", "desc", Severity::Low, "Protocol", vec!["2"], "2");
         let cloned = ctrl.clone_box();
         assert_eq!(cloned.id(), "5.2.1");
     }

@@ -43,14 +43,20 @@ pub fn detect_from_path(path: impl AsRef<Path>) -> Result<Distro, VallumixError>
     }
 
     let id = id.ok_or_else(|| VallumixError::UnsupportedDistro("missing ID".into()))?;
-    let version_id = version_id.ok_or_else(|| VallumixError::UnsupportedDistro("missing VERSION_ID".into()))?;
+    let version_id =
+        version_id.ok_or_else(|| VallumixError::UnsupportedDistro("missing VERSION_ID".into()))?;
 
     match (id.as_str(), version_id.as_str()) {
         ("debian", "12") => Ok(Distro::Debian12),
         ("ubuntu", "22.04") => Ok(Distro::Ubuntu2204),
         ("ubuntu", "24.04") => Ok(Distro::Ubuntu2404),
-        ("rocky", v) | ("almalinux", v) | ("rhel", v) if v.starts_with("9.") || v == "9" => Ok(Distro::Rocky9),
-        _ => Err(VallumixError::UnsupportedDistro(format!("{}/{}", id, version_id))),
+        ("rocky", v) | ("almalinux", v) | ("rhel", v) if v.starts_with("9.") || v == "9" => {
+            Ok(Distro::Rocky9)
+        }
+        _ => Err(VallumixError::UnsupportedDistro(format!(
+            "{}/{}",
+            id, version_id
+        ))),
     }
 }
 

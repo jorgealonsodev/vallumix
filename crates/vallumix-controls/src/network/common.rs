@@ -2,8 +2,10 @@ use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -68,18 +70,34 @@ impl SysctlControl {
 
     fn read_param(&self, suffix: &str) -> Result<String, ControlError> {
         let path = self.proc_prefix.join(suffix.trim_start_matches('/'));
-        Ok(fs::read_to_string(&path).unwrap_or_else(|_| "1\n".into()).trim().into())
+        Ok(fs::read_to_string(&path)
+            .unwrap_or_else(|_| "1\n".into())
+            .trim()
+            .into())
     }
 }
 
 impl Control for SysctlControl {
-    fn id(&self) -> &str { self.id }
-    fn description(&self) -> &str { self.description }
-    fn severity(&self) -> Severity { self.severity }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        self.id
     }
-    fn category(&self) -> Category { Category::Network }
+    fn description(&self) -> &str {
+        self.description
+    }
+    fn severity(&self) -> Severity {
+        self.severity
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Network
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let mut non_compliant = Vec::new();
@@ -90,30 +108,50 @@ impl Control for SysctlControl {
             }
         }
         if non_compliant.is_empty() {
-            Ok(CheckResult { status: CheckStatus::Compliant, evidence: "all sysctl parameters correct".into(), message: None })
+            Ok(CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "all sysctl parameters correct".into(),
+                message: None,
+            })
         } else {
-            Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: non_compliant.join("; "), message: Some("sysctl values need adjustment".into()) })
+            Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: non_compliant.join("; "),
+                message: Some("sysctl values need adjustment".into()),
+            })
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some(format!("dry-run: would write {}", self.dropin_name)) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some(format!("dry-run: would write {}", self.dropin_name)),
+            });
         }
         let dropin = self.sysctl_dir.join(self.dropin_name);
         fs::create_dir_all(&self.sysctl_dir)?;
         let mut f = fs::File::create(&dropin)?;
         f.write_all(self.dropin_content.as_bytes())?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some(format!("wrote {}", dropin.display())) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some(format!("wrote {}", dropin.display())),
+        })
     }
 
     fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
         let dropin = self.sysctl_dir.join(self.dropin_name);
-        if dropin.exists() { fs::remove_file(&dropin)?; }
+        if dropin.exists() {
+            fs::remove_file(&dropin)?;
+        }
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[cfg(test)]
@@ -173,7 +211,11 @@ mod tests {
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
         std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "0\n").unwrap();
-        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::write(
+            proc_prefix.join("net/ipv4/conf/default/send_redirects"),
+            "0\n",
+        )
+        .unwrap();
 
         let ctrl = make_sysctl_control(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -189,7 +231,11 @@ mod tests {
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/all")).unwrap();
         std::fs::create_dir_all(proc_prefix.join("net/ipv4/conf/default")).unwrap();
         std::fs::write(proc_prefix.join("net/ipv4/conf/all/send_redirects"), "1\n").unwrap();
-        std::fs::write(proc_prefix.join("net/ipv4/conf/default/send_redirects"), "0\n").unwrap();
+        std::fs::write(
+            proc_prefix.join("net/ipv4/conf/default/send_redirects"),
+            "0\n",
+        )
+        .unwrap();
 
         let ctrl = make_sysctl_control(proc_prefix, sysctl_dir);
         let result = ctrl.check(&test_ctx(false)).unwrap();
@@ -291,14 +337,7 @@ mod tests {
 
     #[test]
     fn clone_box_produces_identical_control() {
-        let ctrl = SysctlControl::new(
-            "3.1.2",
-            "desc",
-            Severity::Low,
-            vec![],
-            "test.conf",
-            "",
-        );
+        let ctrl = SysctlControl::new("3.1.2", "desc", Severity::Low, vec![], "test.conf", "");
         let cloned = ctrl.clone_box();
         assert_eq!(cloned.id(), "3.1.2");
         assert_eq!(cloned.description(), "desc");

@@ -3,8 +3,8 @@
 mod cli;
 mod commands;
 
-use cli::{Cli, Commands};
 use clap::Parser;
+use cli::{Cli, Commands};
 use owo_colors::OwoColorize;
 
 fn init_tracing(verbose: bool, quiet: bool) {
@@ -16,9 +16,7 @@ fn init_tracing(verbose: bool, quiet: bool) {
         tracing::Level::INFO
     };
 
-    tracing_subscriber::fmt()
-        .with_max_level(level)
-        .init();
+    tracing_subscriber::fmt().with_max_level(level).init();
 }
 
 fn check_privileges() -> bool {
@@ -43,9 +41,10 @@ fn main() {
 
     init_tracing(cli.verbose, cli.quiet);
 
-    let report_formats: Option<Vec<String>> = cli.report.as_ref().map(|s| {
-        s.split(',').map(|f| f.trim().to_lowercase()).collect()
-    });
+    let report_formats: Option<Vec<String>> = cli
+        .report
+        .as_ref()
+        .map(|s| s.split(',').map(|f| f.trim().to_lowercase()).collect());
 
     let exit_code = match &cli.command {
         Commands::Apply => {
@@ -60,7 +59,8 @@ fn main() {
                 report_formats.clone(),
                 cli.output.as_deref(),
                 cli.quiet,
-            ).unwrap_or(2)
+            )
+            .unwrap_or(2)
         }
         Commands::Audit => commands::audit::run(
             &cli.profile,
@@ -68,8 +68,12 @@ fn main() {
             report_formats.clone(),
             cli.output.as_deref(),
             cli.quiet,
-        ).unwrap_or(2),
-        Commands::Rollback { control_id, session } => commands::rollback::run(control_id.clone(), session.clone()).unwrap_or(2),
+        )
+        .unwrap_or(2),
+        Commands::Rollback {
+            control_id,
+            session,
+        } => commands::rollback::run(control_id.clone(), session.clone()).unwrap_or(2),
         Commands::List => commands::list::run().unwrap_or(2),
         Commands::Completion { shell } => commands::completion::run(*shell).unwrap_or(2),
     };
@@ -138,7 +142,10 @@ mod tests {
     fn cli_rollback_with_control_id() {
         let cli = Cli::parse_from(["vallumix", "rollback", "--control-id", "5.2.4"]);
         match cli.command {
-            Commands::Rollback { control_id, session } => {
+            Commands::Rollback {
+                control_id,
+                session,
+            } => {
                 assert_eq!(control_id, Some("5.2.4".into()));
                 assert_eq!(session, None);
             }
@@ -150,7 +157,10 @@ mod tests {
     fn cli_rollback_without_control_id() {
         let cli = Cli::parse_from(["vallumix", "rollback"]);
         match cli.command {
-            Commands::Rollback { control_id, session } => {
+            Commands::Rollback {
+                control_id,
+                session,
+            } => {
                 assert_eq!(control_id, None);
                 assert_eq!(session, None);
             }
@@ -162,7 +172,10 @@ mod tests {
     fn cli_rollback_with_session() {
         let cli = Cli::parse_from(["vallumix", "rollback", "--session", "web-1234567890"]);
         match cli.command {
-            Commands::Rollback { control_id, session } => {
+            Commands::Rollback {
+                control_id,
+                session,
+            } => {
                 assert_eq!(control_id, None);
                 assert_eq!(session, Some("web-1234567890".into()));
             }

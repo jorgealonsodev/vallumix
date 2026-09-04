@@ -2,8 +2,10 @@ use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -117,7 +119,14 @@ mod tests {
         perms.set_mode(0o644);
         fs::set_permissions(tmp.path(), perms).unwrap();
         let ctrl = EnsurePermsPasswd::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
     }
@@ -129,7 +138,14 @@ mod tests {
         perms.set_mode(0o777);
         fs::set_permissions(tmp.path(), perms).unwrap();
         let ctrl = EnsurePermsPasswd::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }
@@ -141,7 +157,14 @@ mod tests {
         perms.set_mode(0o777);
         fs::set_permissions(tmp.path(), perms).unwrap();
         let ctrl = EnsurePermsPasswd::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.apply(&ctx).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
         let metadata = fs::metadata(tmp.path()).unwrap();

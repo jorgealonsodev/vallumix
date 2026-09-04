@@ -12,14 +12,13 @@ pub use text::TextReporter;
 
 use vallumix_core::profile::{ControlReport, HostInfo, Report, Summary};
 
-pub fn build_report(
-    hostname: String,
-    distro: String,
-    controls: Vec<ControlReport>,
-) -> Report {
+pub fn build_report(hostname: String, distro: String, controls: Vec<ControlReport>) -> Report {
     let total = controls.len();
     let pass = controls.iter().filter(|c| c.status == "Compliant").count();
-    let fail = controls.iter().filter(|c| c.status == "NonCompliant").count();
+    let fail = controls
+        .iter()
+        .filter(|c| c.status == "NonCompliant")
+        .count();
     let skip = controls.iter().filter(|c| c.status == "Skipped").count();
     let compliance_rate = if total > 0 {
         (pass as f64 / total as f64) * 100.0

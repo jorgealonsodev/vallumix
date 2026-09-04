@@ -70,8 +70,8 @@ impl Profile {
                 VallumixError::Io(e)
             }
         })?;
-        let profile: Profile = toml::from_str(&content)
-            .map_err(|e| VallumixError::ReportGeneration(e.to_string()))?;
+        let profile: Profile =
+            toml::from_str(&content).map_err(|e| VallumixError::ReportGeneration(e.to_string()))?;
         Ok(profile)
     }
 
@@ -195,33 +195,79 @@ controls = ["1.1.1.1", "5.2.4"]
 
     #[test]
     fn controls_by_category_groups_correctly() {
-        use crate::control::{Category, Control};
         use crate::context::Context;
+        use crate::control::{Category, Control};
         use crate::distro::Distro;
         use crate::error::ControlError;
         use crate::profile::Backup;
 
-        struct FakeControl { id: &'static str, cat: Category }
+        struct FakeControl {
+            id: &'static str,
+            cat: Category,
+        }
         impl Control for FakeControl {
-            fn id(&self) -> &str { self.id }
-            fn description(&self) -> &str { "fake" }
-            fn severity(&self) -> crate::control::Severity { crate::control::Severity::Low }
-            fn applicable_distros(&self) -> &[Distro] { &[] }
-            fn category(&self) -> Category { self.cat }
+            fn id(&self) -> &str {
+                self.id
+            }
+            fn description(&self) -> &str {
+                "fake"
+            }
+            fn severity(&self) -> crate::control::Severity {
+                crate::control::Severity::Low
+            }
+            fn applicable_distros(&self) -> &[Distro] {
+                &[]
+            }
+            fn category(&self) -> Category {
+                self.cat
+            }
             fn check(&self, _ctx: &Context) -> Result<crate::control::CheckResult, ControlError> {
-                Ok(crate::control::CheckResult { status: crate::control::CheckStatus::Compliant, evidence: "".into(), message: None })
+                Ok(crate::control::CheckResult {
+                    status: crate::control::CheckStatus::Compliant,
+                    evidence: "".into(),
+                    message: None,
+                })
             }
             fn apply(&self, _ctx: &Context) -> Result<crate::control::ApplyResult, ControlError> {
-                Ok(crate::control::ApplyResult { status: crate::control::ApplyStatus::Applied, backup_path: None, message: None })
+                Ok(crate::control::ApplyResult {
+                    status: crate::control::ApplyStatus::Applied,
+                    backup_path: None,
+                    message: None,
+                })
             }
-            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-            fn clone_box(&self) -> Box<dyn Control> { Box::new(FakeControl { id: self.id, cat: self.cat }) }
+            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+                Ok(())
+            }
+            fn clone_box(&self) -> Box<dyn Control> {
+                Box::new(FakeControl {
+                    id: self.id,
+                    cat: self.cat,
+                })
+            }
         }
 
         let mut registry = std::collections::HashMap::new();
-        registry.insert("1.1.1.1".into(), Box::new(FakeControl { id: "1.1.1.1", cat: Category::Filesystem }) as Box<dyn Control>);
-        registry.insert("5.2.4".into(), Box::new(FakeControl { id: "5.2.4", cat: Category::Ssh }) as Box<dyn Control>);
-        registry.insert("3.1.1".into(), Box::new(FakeControl { id: "3.1.1", cat: Category::Network }) as Box<dyn Control>);
+        registry.insert(
+            "1.1.1.1".into(),
+            Box::new(FakeControl {
+                id: "1.1.1.1",
+                cat: Category::Filesystem,
+            }) as Box<dyn Control>,
+        );
+        registry.insert(
+            "5.2.4".into(),
+            Box::new(FakeControl {
+                id: "5.2.4",
+                cat: Category::Ssh,
+            }) as Box<dyn Control>,
+        );
+        registry.insert(
+            "3.1.1".into(),
+            Box::new(FakeControl {
+                id: "3.1.1",
+                cat: Category::Network,
+            }) as Box<dyn Control>,
+        );
 
         let profile = Profile {
             name: "test".into(),
@@ -249,27 +295,49 @@ controls = ["1.1.1.1", "5.2.4"]
 
     #[test]
     fn is_applicable_when_all_controls_match_distro() {
-        use crate::control::{Category, Control};
         use crate::context::Context;
+        use crate::control::{Category, Control};
         use crate::distro::Distro;
         use crate::error::ControlError;
         use crate::profile::Backup;
 
         struct DebianOnly;
         impl Control for DebianOnly {
-            fn id(&self) -> &str { "d" }
-            fn description(&self) -> &str { "d" }
-            fn severity(&self) -> crate::control::Severity { crate::control::Severity::Low }
-            fn applicable_distros(&self) -> &[Distro] { &[Distro::Debian12] }
-            fn category(&self) -> Category { Category::Filesystem }
+            fn id(&self) -> &str {
+                "d"
+            }
+            fn description(&self) -> &str {
+                "d"
+            }
+            fn severity(&self) -> crate::control::Severity {
+                crate::control::Severity::Low
+            }
+            fn applicable_distros(&self) -> &[Distro] {
+                &[Distro::Debian12]
+            }
+            fn category(&self) -> Category {
+                Category::Filesystem
+            }
             fn check(&self, _ctx: &Context) -> Result<crate::control::CheckResult, ControlError> {
-                Ok(crate::control::CheckResult { status: crate::control::CheckStatus::Compliant, evidence: "".into(), message: None })
+                Ok(crate::control::CheckResult {
+                    status: crate::control::CheckStatus::Compliant,
+                    evidence: "".into(),
+                    message: None,
+                })
             }
             fn apply(&self, _ctx: &Context) -> Result<crate::control::ApplyResult, ControlError> {
-                Ok(crate::control::ApplyResult { status: crate::control::ApplyStatus::Applied, backup_path: None, message: None })
+                Ok(crate::control::ApplyResult {
+                    status: crate::control::ApplyStatus::Applied,
+                    backup_path: None,
+                    message: None,
+                })
             }
-            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-            fn clone_box(&self) -> Box<dyn Control> { Box::new(DebianOnly) }
+            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+                Ok(())
+            }
+            fn clone_box(&self) -> Box<dyn Control> {
+                Box::new(DebianOnly)
+            }
         }
 
         let mut registry = std::collections::HashMap::new();
@@ -285,27 +353,49 @@ controls = ["1.1.1.1", "5.2.4"]
 
     #[test]
     fn is_applicable_when_control_does_not_match_distro() {
-        use crate::control::{Category, Control};
         use crate::context::Context;
+        use crate::control::{Category, Control};
         use crate::distro::Distro;
         use crate::error::ControlError;
         use crate::profile::Backup;
 
         struct DebianOnly;
         impl Control for DebianOnly {
-            fn id(&self) -> &str { "d" }
-            fn description(&self) -> &str { "d" }
-            fn severity(&self) -> crate::control::Severity { crate::control::Severity::Low }
-            fn applicable_distros(&self) -> &[Distro] { &[Distro::Debian12] }
-            fn category(&self) -> Category { Category::Filesystem }
+            fn id(&self) -> &str {
+                "d"
+            }
+            fn description(&self) -> &str {
+                "d"
+            }
+            fn severity(&self) -> crate::control::Severity {
+                crate::control::Severity::Low
+            }
+            fn applicable_distros(&self) -> &[Distro] {
+                &[Distro::Debian12]
+            }
+            fn category(&self) -> Category {
+                Category::Filesystem
+            }
             fn check(&self, _ctx: &Context) -> Result<crate::control::CheckResult, ControlError> {
-                Ok(crate::control::CheckResult { status: crate::control::CheckStatus::Compliant, evidence: "".into(), message: None })
+                Ok(crate::control::CheckResult {
+                    status: crate::control::CheckStatus::Compliant,
+                    evidence: "".into(),
+                    message: None,
+                })
             }
             fn apply(&self, _ctx: &Context) -> Result<crate::control::ApplyResult, ControlError> {
-                Ok(crate::control::ApplyResult { status: crate::control::ApplyStatus::Applied, backup_path: None, message: None })
+                Ok(crate::control::ApplyResult {
+                    status: crate::control::ApplyStatus::Applied,
+                    backup_path: None,
+                    message: None,
+                })
             }
-            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-            fn clone_box(&self) -> Box<dyn Control> { Box::new(DebianOnly) }
+            fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+                Ok(())
+            }
+            fn clone_box(&self) -> Box<dyn Control> {
+                Box::new(DebianOnly)
+            }
         }
 
         let mut registry = std::collections::HashMap::new();

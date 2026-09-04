@@ -1,8 +1,10 @@
 use std::fs;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -144,7 +146,14 @@ mod tests {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         writeln!(tmp, "PermitRootLogin no").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
     }
@@ -154,7 +163,14 @@ mod tests {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         writeln!(tmp, "PermitRootLogin yes").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }
@@ -164,7 +180,14 @@ mod tests {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         writeln!(tmp, "Port 22").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }
@@ -174,7 +197,14 @@ mod tests {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         write!(tmp, "Port 22\nPermitRootLogin yes\n").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.apply(&ctx).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
         let content = fs::read_to_string(tmp.path()).unwrap();
@@ -187,7 +217,14 @@ mod tests {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         writeln!(tmp, "Port 22").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.apply(&ctx).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
         let content = fs::read_to_string(tmp.path()).unwrap();
@@ -199,7 +236,14 @@ mod tests {
         let mut tmp = tempfile::NamedTempFile::new().unwrap();
         write!(tmp, "Port 22\n#PermitRootLogin yes\n").unwrap();
         let ctrl = SshDisableRootLogin::with_path(tmp.path().into());
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.apply(&ctx).unwrap();
         assert_eq!(result.status, ApplyStatus::Applied);
         let content = fs::read_to_string(tmp.path()).unwrap();
@@ -211,7 +255,14 @@ mod tests {
         let manifest = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         let fixture = manifest.join("tests/fixtures/sshd_root_no");
         let ctrl = SshDisableRootLogin::with_path(fixture);
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);
     }
@@ -221,7 +272,14 @@ mod tests {
         let manifest = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         let fixture = manifest.join("tests/fixtures/sshd_root_yes");
         let ctrl = SshDisableRootLogin::with_path(fixture);
-        let ctx = Context::with_paths("test".into(), Distro::Debian12, "/tmp".into(), "/tmp".into(), "/tmp".into(), false);
+        let ctx = Context::with_paths(
+            "test".into(),
+            Distro::Debian12,
+            "/tmp".into(),
+            "/tmp".into(),
+            "/tmp".into(),
+            false,
+        );
         let result = ctrl.check(&ctx).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }

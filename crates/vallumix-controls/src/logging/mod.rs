@@ -3,8 +3,10 @@ pub mod common;
 use std::fs;
 use std::path::PathBuf;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -26,37 +28,76 @@ impl Default for EnsureRsyslogInstalled {
 }
 
 impl EnsureRsyslogInstalled {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_paths(paths: Vec<PathBuf>) -> Self { EnsureRsyslogInstalled { binary_paths: paths } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_paths(paths: Vec<PathBuf>) -> Self {
+        EnsureRsyslogInstalled {
+            binary_paths: paths,
+        }
+    }
 }
 
 impl Control for EnsureRsyslogInstalled {
-    fn id(&self) -> &str { "4.1.1.1" }
-    fn description(&self) -> &str { "Ensure rsyslog is installed" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.1.1"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure rsyslog is installed"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let installed = self.binary_paths.iter().any(|p| p.exists());
         Ok(if installed {
-            CheckResult { status: CheckStatus::Compliant, evidence: "rsyslog is installed".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "rsyslog is installed".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "rsyslog is not installed".into(), message: Some("install rsyslog".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "rsyslog is not installed".into(),
+                message: Some("install rsyslog".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would install rsyslog".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would install rsyslog".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("package installation not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("package installation not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -66,43 +107,82 @@ pub struct EnsureRsyslogConfigured {
 
 impl Default for EnsureRsyslogConfigured {
     fn default() -> Self {
-        EnsureRsyslogConfigured { config_path: PathBuf::from("/etc/rsyslog.conf") }
+        EnsureRsyslogConfigured {
+            config_path: PathBuf::from("/etc/rsyslog.conf"),
+        }
     }
 }
 
 impl EnsureRsyslogConfigured {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(config_path: PathBuf) -> Self { EnsureRsyslogConfigured { config_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(config_path: PathBuf) -> Self {
+        EnsureRsyslogConfigured { config_path }
+    }
 }
 
 impl Control for EnsureRsyslogConfigured {
-    fn id(&self) -> &str { "4.1.1.2" }
-    fn description(&self) -> &str { "Ensure rsyslog default file permissions are configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.1.2"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure rsyslog default file permissions are configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.config_path).unwrap_or_default();
         let has_auth = content.lines().any(|l| l.contains("auth,authpriv.*"));
         Ok(if has_auth {
-            CheckResult { status: CheckStatus::Compliant, evidence: "rsyslog auth directive found".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "rsyslog auth directive found".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "rsyslog auth directive missing".into(), message: Some("add auth,authpriv.* directive".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "rsyslog auth directive missing".into(),
+                message: Some("add auth,authpriv.* directive".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure rsyslog".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure rsyslog".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("rsyslog configuration not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("rsyslog configuration not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -112,23 +192,42 @@ pub struct EnsureRsyslogPerms {
 
 impl Default for EnsureRsyslogPerms {
     fn default() -> Self {
-        EnsureRsyslogPerms { log_dir: PathBuf::from("/var/log") }
+        EnsureRsyslogPerms {
+            log_dir: PathBuf::from("/var/log"),
+        }
     }
 }
 
 impl EnsureRsyslogPerms {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(log_dir: PathBuf) -> Self { EnsureRsyslogPerms { log_dir } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(log_dir: PathBuf) -> Self {
+        EnsureRsyslogPerms { log_dir }
+    }
 }
 
 impl Control for EnsureRsyslogPerms {
-    fn id(&self) -> &str { "4.1.1.3" }
-    fn description(&self) -> &str { "Ensure rsyslog log file permissions are configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.1.3"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure rsyslog log file permissions are configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         use std::os::unix::fs::PermissionsExt;
@@ -147,21 +246,41 @@ impl Control for EnsureRsyslogPerms {
             }
         }
         if bad.is_empty() {
-            Ok(CheckResult { status: CheckStatus::Compliant, evidence: "log files have correct permissions".into(), message: None })
+            Ok(CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "log files have correct permissions".into(),
+                message: None,
+            })
         } else {
-            Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("log files with incorrect permissions: {:?}", bad), message: Some("log files should be 0640 or more restrictive".into()) })
+            Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: format!("log files with incorrect permissions: {:?}", bad),
+                message: Some("log files should be 0640 or more restrictive".into()),
+            })
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would fix log perms".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would fix log perms".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("log permission fix not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("log permission fix not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -171,37 +290,70 @@ pub struct EnsureJournaldConfigured {
 
 impl Default for EnsureJournaldConfigured {
     fn default() -> Self {
-        EnsureJournaldConfigured { config_path: PathBuf::from("/etc/systemd/journald.conf") }
+        EnsureJournaldConfigured {
+            config_path: PathBuf::from("/etc/systemd/journald.conf"),
+        }
     }
 }
 
 impl EnsureJournaldConfigured {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(config_path: PathBuf) -> Self { EnsureJournaldConfigured { config_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(config_path: PathBuf) -> Self {
+        EnsureJournaldConfigured { config_path }
+    }
 }
 
 impl Control for EnsureJournaldConfigured {
-    fn id(&self) -> &str { "4.1.2.1" }
-    fn description(&self) -> &str { "Ensure journald is configured to write to persistent disk" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.2.1"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure journald is configured to write to persistent disk"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.config_path).unwrap_or_default();
-        let persistent = content.lines().any(|l| l.trim().starts_with("Storage") && l.contains("persistent"));
+        let persistent = content
+            .lines()
+            .any(|l| l.trim().starts_with("Storage") && l.contains("persistent"));
         Ok(if persistent {
-            CheckResult { status: CheckStatus::Compliant, evidence: "journald Storage=persistent".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "journald Storage=persistent".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "journald Storage not set to persistent".into(), message: Some("set Storage=persistent in journald.conf".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "journald Storage not set to persistent".into(),
+                message: Some("set Storage=persistent in journald.conf".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure journald".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure journald".into()),
+            });
         }
         let content = fs::read_to_string(&self.config_path).unwrap_or_default();
         let mut lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
@@ -212,13 +364,23 @@ impl Control for EnsureJournaldConfigured {
                 found = true;
             }
         }
-        if !found { lines.push("Storage=persistent".to_string()); }
+        if !found {
+            lines.push("Storage=persistent".to_string());
+        }
         fs::write(&self.config_path, lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set Storage=persistent".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set Storage=persistent".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -228,49 +390,91 @@ pub struct EnsureJournaldOverride {
 
 impl Default for EnsureJournaldOverride {
     fn default() -> Self {
-        EnsureJournaldOverride { dropin_dir: PathBuf::from("/etc/systemd/journald.conf.d") }
+        EnsureJournaldOverride {
+            dropin_dir: PathBuf::from("/etc/systemd/journald.conf.d"),
+        }
     }
 }
 
 impl EnsureJournaldOverride {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(dropin_dir: PathBuf) -> Self { EnsureJournaldOverride { dropin_dir } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(dropin_dir: PathBuf) -> Self {
+        EnsureJournaldOverride { dropin_dir }
+    }
 }
 
 impl Control for EnsureJournaldOverride {
-    fn id(&self) -> &str { "4.1.2.2" }
-    fn description(&self) -> &str { "Ensure journald drop-in is configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.2.2"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure journald drop-in is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let dropin = self.dropin_dir.join("vallumix-journald.conf");
         Ok(if dropin.exists() {
-            CheckResult { status: CheckStatus::Compliant, evidence: "journald drop-in exists".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "journald drop-in exists".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "journald drop-in missing".into(), message: Some("create journald drop-in".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "journald drop-in missing".into(),
+                message: Some("create journald drop-in".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would create journald drop-in".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would create journald drop-in".into()),
+            });
         }
         fs::create_dir_all(&self.dropin_dir)?;
-        fs::write(self.dropin_dir.join("vallumix-journald.conf"), "[Journal]\nStorage=persistent\n")?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("created journald drop-in".into()) })
+        fs::write(
+            self.dropin_dir.join("vallumix-journald.conf"),
+            "[Journal]\nStorage=persistent\n",
+        )?;
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("created journald drop-in".into()),
+        })
     }
 
     fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
         let dropin = self.dropin_dir.join("vallumix-journald.conf");
-        if dropin.exists() { fs::remove_file(&dropin)?; }
+        if dropin.exists() {
+            fs::remove_file(&dropin)?;
+        }
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -290,37 +494,76 @@ impl Default for EnsureAuditdInstalled {
 }
 
 impl EnsureAuditdInstalled {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_paths(paths: Vec<PathBuf>) -> Self { EnsureAuditdInstalled { binary_paths: paths } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_paths(paths: Vec<PathBuf>) -> Self {
+        EnsureAuditdInstalled {
+            binary_paths: paths,
+        }
+    }
 }
 
 impl Control for EnsureAuditdInstalled {
-    fn id(&self) -> &str { "4.1.3.1" }
-    fn description(&self) -> &str { "Ensure auditd is installed" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.3.1"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure auditd is installed"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let installed = self.binary_paths.iter().any(|p| p.exists());
         Ok(if installed {
-            CheckResult { status: CheckStatus::Compliant, evidence: "auditd is installed".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "auditd is installed".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "auditd is not installed".into(), message: Some("install auditd".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "auditd is not installed".into(),
+                message: Some("install auditd".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would install auditd".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would install auditd".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("package installation not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("package installation not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -330,37 +573,70 @@ pub struct EnsureAuditdConfigured {
 
 impl Default for EnsureAuditdConfigured {
     fn default() -> Self {
-        EnsureAuditdConfigured { config_path: PathBuf::from("/etc/audit/auditd.conf") }
+        EnsureAuditdConfigured {
+            config_path: PathBuf::from("/etc/audit/auditd.conf"),
+        }
     }
 }
 
 impl EnsureAuditdConfigured {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(config_path: PathBuf) -> Self { EnsureAuditdConfigured { config_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(config_path: PathBuf) -> Self {
+        EnsureAuditdConfigured { config_path }
+    }
 }
 
 impl Control for EnsureAuditdConfigured {
-    fn id(&self) -> &str { "4.1.3.2" }
-    fn description(&self) -> &str { "Ensure auditd max_log_file_action is configured" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.3.2"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure auditd max_log_file_action is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         let content = fs::read_to_string(&self.config_path).unwrap_or_default();
-        let ok = content.lines().any(|l| l.trim().starts_with("max_log_file_action") && l.contains("keep_logs"));
+        let ok = content
+            .lines()
+            .any(|l| l.trim().starts_with("max_log_file_action") && l.contains("keep_logs"));
         Ok(if ok {
-            CheckResult { status: CheckStatus::Compliant, evidence: "max_log_file_action = keep_logs".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "max_log_file_action = keep_logs".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "max_log_file_action not set to keep_logs".into(), message: Some("set max_log_file_action = keep_logs".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "max_log_file_action not set to keep_logs".into(),
+                message: Some("set max_log_file_action = keep_logs".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure auditd".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure auditd".into()),
+            });
         }
         let content = fs::read_to_string(&self.config_path).unwrap_or_default();
         let mut lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
@@ -371,13 +647,23 @@ impl Control for EnsureAuditdConfigured {
                 found = true;
             }
         }
-        if !found { lines.push("max_log_file_action = keep_logs".to_string()); }
+        if !found {
+            lines.push("max_log_file_action = keep_logs".to_string());
+        }
         fs::write(&self.config_path, lines.join("\n"))?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("set max_log_file_action = keep_logs".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("set max_log_file_action = keep_logs".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -387,53 +673,96 @@ pub struct EnsureAuditIdentityRules {
 
 impl Default for EnsureAuditIdentityRules {
     fn default() -> Self {
-        EnsureAuditIdentityRules { rules_path: PathBuf::from("/etc/audit/rules.d/vallumix.rules") }
+        EnsureAuditIdentityRules {
+            rules_path: PathBuf::from("/etc/audit/rules.d/vallumix.rules"),
+        }
     }
 }
 
 impl EnsureAuditIdentityRules {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(rules_path: PathBuf) -> Self { EnsureAuditIdentityRules { rules_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(rules_path: PathBuf) -> Self {
+        EnsureAuditIdentityRules { rules_path }
+    }
 }
 
 impl Control for EnsureAuditIdentityRules {
-    fn id(&self) -> &str { "4.1.4.1" }
-    fn description(&self) -> &str { "Ensure audit identity events are collected" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.4.1"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure audit identity events are collected"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         if !self.rules_path.exists() {
-            return Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "audit rules file missing".into(), message: Some("create audit identity rules".into()) });
+            return Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "audit rules file missing".into(),
+                message: Some("create audit identity rules".into()),
+            });
         }
         let content = fs::read_to_string(&self.rules_path).unwrap_or_default();
         let has_rule = content.contains("/etc/group") && content.contains("/etc/passwd");
         Ok(if has_rule {
-            CheckResult { status: CheckStatus::Compliant, evidence: "audit identity rules present".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "audit identity rules present".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "audit identity rules incomplete".into(), message: Some("add identity audit rules".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "audit identity rules incomplete".into(),
+                message: Some("add identity audit rules".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would add audit identity rules".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would add audit identity rules".into()),
+            });
         }
         fs::create_dir_all(self.rules_path.parent().unwrap())?;
         let rules = "-w /etc/passwd -p wa -k identity\n-w /etc/group -p wa -k identity\n";
         fs::write(&self.rules_path, rules)?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("added audit identity rules".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("added audit identity rules".into()),
+        })
     }
 
     fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
-        if self.rules_path.exists() { fs::remove_file(&self.rules_path)?; }
+        if self.rules_path.exists() {
+            fs::remove_file(&self.rules_path)?;
+        }
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -443,53 +772,96 @@ pub struct EnsureAuditLoginEvents {
 
 impl Default for EnsureAuditLoginEvents {
     fn default() -> Self {
-        EnsureAuditLoginEvents { rules_path: PathBuf::from("/etc/audit/rules.d/vallumix.rules") }
+        EnsureAuditLoginEvents {
+            rules_path: PathBuf::from("/etc/audit/rules.d/vallumix.rules"),
+        }
     }
 }
 
 impl EnsureAuditLoginEvents {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(rules_path: PathBuf) -> Self { EnsureAuditLoginEvents { rules_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(rules_path: PathBuf) -> Self {
+        EnsureAuditLoginEvents { rules_path }
+    }
 }
 
 impl Control for EnsureAuditLoginEvents {
-    fn id(&self) -> &str { "4.1.4.2" }
-    fn description(&self) -> &str { "Ensure audit login events are collected" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.4.2"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure audit login events are collected"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         if !self.rules_path.exists() {
-            return Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "audit rules file missing".into(), message: Some("create audit login rules".into()) });
+            return Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "audit rules file missing".into(),
+                message: Some("create audit login rules".into()),
+            });
         }
         let content = fs::read_to_string(&self.rules_path).unwrap_or_default();
         let has_rule = content.contains("/var/log/wtmp") || content.contains("/var/log/btmp");
         Ok(if has_rule {
-            CheckResult { status: CheckStatus::Compliant, evidence: "audit login rules present".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "audit login rules present".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "audit login rules incomplete".into(), message: Some("add login audit rules".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "audit login rules incomplete".into(),
+                message: Some("add login audit rules".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would add audit login rules".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would add audit login rules".into()),
+            });
         }
         fs::create_dir_all(self.rules_path.parent().unwrap())?;
         let rules = "-w /var/log/wtmp -p wa -k logins\n-w /var/log/btmp -p wa -k logins\n";
         fs::write(&self.rules_path, rules)?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("added audit login rules".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("added audit login rules".into()),
+        })
     }
 
     fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
-        if self.rules_path.exists() { fs::remove_file(&self.rules_path)?; }
+        if self.rules_path.exists() {
+            fs::remove_file(&self.rules_path)?;
+        }
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -499,53 +871,96 @@ pub struct EnsureAuditSessionEvents {
 
 impl Default for EnsureAuditSessionEvents {
     fn default() -> Self {
-        EnsureAuditSessionEvents { rules_path: PathBuf::from("/etc/audit/rules.d/vallumix.rules") }
+        EnsureAuditSessionEvents {
+            rules_path: PathBuf::from("/etc/audit/rules.d/vallumix.rules"),
+        }
     }
 }
 
 impl EnsureAuditSessionEvents {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(rules_path: PathBuf) -> Self { EnsureAuditSessionEvents { rules_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(rules_path: PathBuf) -> Self {
+        EnsureAuditSessionEvents { rules_path }
+    }
 }
 
 impl Control for EnsureAuditSessionEvents {
-    fn id(&self) -> &str { "4.1.4.3" }
-    fn description(&self) -> &str { "Ensure audit session events are collected" }
-    fn severity(&self) -> Severity { Severity::Medium }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.4.3"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure audit session events are collected"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Medium
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         if !self.rules_path.exists() {
-            return Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "audit rules file missing".into(), message: Some("create audit session rules".into()) });
+            return Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "audit rules file missing".into(),
+                message: Some("create audit session rules".into()),
+            });
         }
         let content = fs::read_to_string(&self.rules_path).unwrap_or_default();
         let has_rule = content.contains("/var/run/utmp");
         Ok(if has_rule {
-            CheckResult { status: CheckStatus::Compliant, evidence: "audit session rules present".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "audit session rules present".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "audit session rules incomplete".into(), message: Some("add session audit rules".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "audit session rules incomplete".into(),
+                message: Some("add session audit rules".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would add audit session rules".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would add audit session rules".into()),
+            });
         }
         fs::create_dir_all(self.rules_path.parent().unwrap())?;
         let rules = "-w /var/run/utmp -p wa -k session\n";
         fs::write(&self.rules_path, rules)?;
-        Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some("added audit session rules".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Applied,
+            backup_path: None,
+            message: Some("added audit session rules".into()),
+        })
     }
 
     fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
-        if self.rules_path.exists() { fs::remove_file(&self.rules_path)?; }
+        if self.rules_path.exists() {
+            fs::remove_file(&self.rules_path)?;
+        }
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -555,46 +970,89 @@ pub struct EnsureLogrotate {
 
 impl Default for EnsureLogrotate {
     fn default() -> Self {
-        EnsureLogrotate { config_path: PathBuf::from("/etc/logrotate.d/rsyslog") }
+        EnsureLogrotate {
+            config_path: PathBuf::from("/etc/logrotate.d/rsyslog"),
+        }
     }
 }
 
 impl EnsureLogrotate {
-    pub fn new() -> Self { Self::default() }
-    pub fn with_path(config_path: PathBuf) -> Self { EnsureLogrotate { config_path } }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn with_path(config_path: PathBuf) -> Self {
+        EnsureLogrotate { config_path }
+    }
 }
 
 impl Control for EnsureLogrotate {
-    fn id(&self) -> &str { "4.1.7" }
-    fn description(&self) -> &str { "Ensure logrotate is configured" }
-    fn severity(&self) -> Severity { Severity::Low }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        "4.1.7"
     }
-    fn category(&self) -> Category { Category::Logging }
+    fn description(&self) -> &str {
+        "Ensure logrotate is configured"
+    }
+    fn severity(&self) -> Severity {
+        Severity::Low
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Logging
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         if !self.config_path.exists() {
-            return Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: "logrotate config missing".into(), message: Some("configure logrotate".into()) });
+            return Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "logrotate config missing".into(),
+                message: Some("configure logrotate".into()),
+            });
         }
         let content = fs::read_to_string(&self.config_path).unwrap_or_default();
         let has_weekly = content.contains("weekly") || content.contains("daily");
         Ok(if has_weekly {
-            CheckResult { status: CheckStatus::Compliant, evidence: "logrotate configured".into(), message: None }
+            CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: "logrotate configured".into(),
+                message: None,
+            }
         } else {
-            CheckResult { status: CheckStatus::NonCompliant, evidence: "logrotate rotation not configured".into(), message: Some("add rotation schedule".into()) }
+            CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: "logrotate rotation not configured".into(),
+                message: Some("add rotation schedule".into()),
+            }
         })
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("dry-run: would configure logrotate".into()) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some("dry-run: would configure logrotate".into()),
+            });
         }
-        Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some("logrotate configuration not implemented".into()) })
+        Ok(ApplyResult {
+            status: ApplyStatus::Skipped,
+            backup_path: None,
+            message: Some("logrotate configuration not implemented".into()),
+        })
     }
 
-    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> { Ok(()) }
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
+        Ok(())
+    }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[cfg(test)]
@@ -627,7 +1085,8 @@ mod tests {
 
     #[test]
     fn ensure_rsyslog_installed_check_non_compliant_when_binary_absent() {
-        let ctrl = EnsureRsyslogInstalled::with_paths(vec![PathBuf::from("/tmp/nonexistent-rsyslogd")]);
+        let ctrl =
+            EnsureRsyslogInstalled::with_paths(vec![PathBuf::from("/tmp/nonexistent-rsyslogd")]);
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }
@@ -723,7 +1182,8 @@ mod tests {
 
     #[test]
     fn ensure_auditd_installed_check_non_compliant_when_absent() {
-        let ctrl = EnsureAuditdInstalled::with_paths(vec![PathBuf::from("/tmp/nonexistent-auditd")]);
+        let ctrl =
+            EnsureAuditdInstalled::with_paths(vec![PathBuf::from("/tmp/nonexistent-auditd")]);
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::NonCompliant);
     }
@@ -751,7 +1211,9 @@ mod tests {
     #[test]
     fn ensure_audit_identity_rules_check_compliant_when_rule_exists() {
         let ctx = LoggingContext::new();
-        ctx.write_audit_rules("-w /etc/passwd -p wa -k identity\n-w /etc/group -p wa -k identity\n");
+        ctx.write_audit_rules(
+            "-w /etc/passwd -p wa -k identity\n-w /etc/group -p wa -k identity\n",
+        );
         let ctrl = EnsureAuditIdentityRules::with_path(ctx.audit_rules_path());
         let result = ctrl.check(&test_ctx(false)).unwrap();
         assert_eq!(result.status, CheckStatus::Compliant);

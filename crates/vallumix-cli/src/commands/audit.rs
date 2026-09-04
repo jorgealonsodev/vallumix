@@ -3,8 +3,8 @@ use std::path::Path;
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
-use vallumix_core::control::CheckStatus;
 use vallumix_core::context::Context;
+use vallumix_core::control::CheckStatus;
 use vallumix_core::distro::Distro;
 use vallumix_core::profile::{ControlReport, Profile, Reporter};
 use vallumix_reporters::{build_report, HtmlReporter, JsonReporter, JunitReporter, TextReporter};
@@ -29,10 +29,7 @@ pub fn run(
         None
     } else {
         let pb = ProgressBar::new(total as u64);
-        pb.set_style(
-            ProgressStyle::with_template("[{pos}/{len}] {msg}")
-                .expect("valid template"),
-        );
+        pb.set_style(ProgressStyle::with_template("[{pos}/{len}] {msg}").expect("valid template"));
         Some(pb)
     };
 
@@ -77,12 +74,11 @@ pub fn run(
         pb.finish_with_message("Done");
     }
 
-    let pass = control_reports.iter().filter(|c| c.status == "Compliant").count();
-    let report = build_report(
-        ctx.hostname.clone(),
-        distro.to_string(),
-        control_reports,
-    );
+    let pass = control_reports
+        .iter()
+        .filter(|c| c.status == "Compliant")
+        .count();
+    let report = build_report(ctx.hostname.clone(), distro.to_string(), control_reports);
 
     if let Some(formats) = report_formats {
         for fmt in formats {

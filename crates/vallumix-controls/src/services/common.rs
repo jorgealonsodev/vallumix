@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use vallumix_core::control::{ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity};
 use vallumix_core::context::Context;
+use vallumix_core::control::{
+    ApplyResult, ApplyStatus, Category, CheckResult, CheckStatus, Control, Severity,
+};
 use vallumix_core::distro::Distro;
 use vallumix_core::error::ControlError;
 use vallumix_core::profile::Backup;
@@ -100,58 +102,133 @@ impl ServiceDisable {
 }
 
 impl Control for ServiceDisable {
-    fn id(&self) -> &str { self.id }
-    fn description(&self) -> &str { self.description }
-    fn severity(&self) -> Severity { self.severity }
-    fn applicable_distros(&self) -> &[Distro] {
-        &[Distro::Debian12, Distro::Ubuntu2204, Distro::Ubuntu2404, Distro::Rocky9]
+    fn id(&self) -> &str {
+        self.id
     }
-    fn category(&self) -> Category { Category::Services }
+    fn description(&self) -> &str {
+        self.description
+    }
+    fn severity(&self) -> Severity {
+        self.severity
+    }
+    fn applicable_distros(&self) -> &[Distro] {
+        &[
+            Distro::Debian12,
+            Distro::Ubuntu2204,
+            Distro::Ubuntu2404,
+            Distro::Rocky9,
+        ]
+    }
+    fn category(&self) -> Category {
+        Category::Services
+    }
 
     fn check(&self, _ctx: &Context) -> Result<CheckResult, ControlError> {
         if !self.service_exists() {
-            return Ok(CheckResult { status: CheckStatus::Compliant, evidence: format!("{} not installed", self.service_name), message: None });
+            return Ok(CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: format!("{} not installed", self.service_name),
+                message: None,
+            });
         }
         let active = self.is_active().unwrap_or(false);
         let enabled = self.is_enabled().unwrap_or(false);
         if !active && !enabled {
-            Ok(CheckResult { status: CheckStatus::Compliant, evidence: format!("{} is stopped and disabled", self.service_name), message: None })
+            Ok(CheckResult {
+                status: CheckStatus::Compliant,
+                evidence: format!("{} is stopped and disabled", self.service_name),
+                message: None,
+            })
         } else {
             let mut reasons = Vec::new();
-            if active { reasons.push("active"); }
-            if enabled { reasons.push("enabled"); }
-            Ok(CheckResult { status: CheckStatus::NonCompliant, evidence: format!("{} is {}", self.service_name, reasons.join(" and ")), message: Some(format!("{} should be stopped and disabled", self.service_name)) })
+            if active {
+                reasons.push("active");
+            }
+            if enabled {
+                reasons.push("enabled");
+            }
+            Ok(CheckResult {
+                status: CheckStatus::NonCompliant,
+                evidence: format!("{} is {}", self.service_name, reasons.join(" and ")),
+                message: Some(format!(
+                    "{} should be stopped and disabled",
+                    self.service_name
+                )),
+            })
         }
     }
 
     fn apply(&self, ctx: &Context) -> Result<ApplyResult, ControlError> {
         if ctx.dry_run {
-            return Ok(ApplyResult { status: ApplyStatus::Skipped, backup_path: None, message: Some(format!("dry-run: would stop and disable {}", self.service_name)) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::Skipped,
+                backup_path: None,
+                message: Some(format!(
+                    "dry-run: would stop and disable {}",
+                    self.service_name
+                )),
+            });
         }
         if !self.service_exists() {
-            return Ok(ApplyResult { status: ApplyStatus::AlreadyCompliant, backup_path: None, message: Some(format!("{} not installed", self.service_name)) });
+            return Ok(ApplyResult {
+                status: ApplyStatus::AlreadyCompliant,
+                backup_path: None,
+                message: Some(format!("{} not installed", self.service_name)),
+            });
         }
-        let stop = Command::new(&self.systemctl_path).args(["stop", &self.service_name]).output().map_err(ControlError::Io)?;
-        let disable = Command::new(&self.systemctl_path).args(["disable", &self.service_name]).output().map_err(ControlError::Io)?;
+        let stop = Command::new(&self.systemctl_path)
+            .args(["stop", &self.service_name])
+            .output()
+            .map_err(ControlError::Io)?;
+        let disable = Command::new(&self.systemctl_path)
+            .args(["disable", &self.service_name])
+            .output()
+            .map_err(ControlError::Io)?;
         if stop.status.success() && disable.status.success() {
-            Ok(ApplyResult { status: ApplyStatus::Applied, backup_path: None, message: Some(format!("{} stopped and disabled", self.service_name)) })
+            Ok(ApplyResult {
+                status: ApplyStatus::Applied,
+                backup_path: None,
+                message: Some(format!("{} stopped and disabled", self.service_name)),
+            })
         } else {
             let mut errs = Vec::new();
-            if !stop.status.success() { errs.push(format!("stop failed: {}", String::from_utf8_lossy(&stop.stderr))); }
-            if !disable.status.success() { errs.push(format!("disable failed: {}", String::from_utf8_lossy(&disable.stderr))); }
-            Ok(ApplyResult { status: ApplyStatus::Failed, backup_path: None, message: Some(errs.join("; ")) })
+            if !stop.status.success() {
+                errs.push(format!(
+                    "stop failed: {}",
+                    String::from_utf8_lossy(&stop.stderr)
+                ));
+            }
+            if !disable.status.success() {
+                errs.push(format!(
+                    "disable failed: {}",
+                    String::from_utf8_lossy(&disable.stderr)
+                ));
+            }
+            Ok(ApplyResult {
+                status: ApplyStatus::Failed,
+                backup_path: None,
+                message: Some(errs.join("; ")),
+            })
         }
     }
 
     fn rollback(&self, _ctx: &Context, _backup: &Backup) -> Result<(), ControlError> {
         if self.service_exists() {
-            Command::new(&self.systemctl_path).args(["enable", &self.service_name]).output().map_err(ControlError::Io)?;
-            Command::new(&self.systemctl_path).args(["start", &self.service_name]).output().map_err(ControlError::Io)?;
+            Command::new(&self.systemctl_path)
+                .args(["enable", &self.service_name])
+                .output()
+                .map_err(ControlError::Io)?;
+            Command::new(&self.systemctl_path)
+                .args(["start", &self.service_name])
+                .output()
+                .map_err(ControlError::Io)?;
         }
         Ok(())
     }
 
-    fn clone_box(&self) -> Box<dyn Control> { Box::new(self.clone()) }
+    fn clone_box(&self) -> Box<dyn Control> {
+        Box::new(self.clone())
+    }
 }
 
 #[cfg(test)]
