@@ -198,3 +198,47 @@ jobs:
         run: |
           cargo install cargo-insta
           cargo insta test --require-full-match -p vallumix-reporters
+
+  smoke-test:
+    # The unit suite passes with a binary that cannot run its own main command:
+    # packaging, profile installation and the wiring in main.rs are all outside
+    # its reach. Four such defects shipped in v1.0.0 and v1.1.0 with a fully
+    # green CI. This job assembles the real package and drives the real binary.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Add musl target
+        run: rustup target add x86_64-unknown-linux-musl
+
+      - name: Install musl toolchain
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Install cargo-deb
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deb
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-smoke-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build the package
+        run: |
+          rm -f target/x86_64-unknown-linux-musl/debian/*.deb target/debian/*.deb
+          cargo build --release --target x86_64-unknown-linux-musl -p vallumix-cli
+          cargo deb --no-build --target x86_64-unknown-linux-musl -p vallumix-cli
+
+      - name: Install the package and drive the binary
+        run: ./scripts/smoke-test.sh

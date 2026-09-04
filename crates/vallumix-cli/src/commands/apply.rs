@@ -5,7 +5,7 @@ use chrono::Utc;
 use indicatif::{ProgressBar, ProgressStyle};
 use vallumix_core::context::Context;
 use vallumix_core::control::{ApplyStatus, CheckStatus};
-use vallumix_core::distro::Distro;
+use vallumix_core::distro;
 use vallumix_core::profile::{ControlReport, Profile, Reporter};
 use vallumix_reporters::{build_report, HtmlReporter, JsonReporter, JunitReporter, TextReporter};
 
@@ -17,7 +17,7 @@ pub fn run(
     output: Option<&Path>,
     quiet: bool,
 ) -> Result<i32> {
-    let distro = Distro::Debian12; // TODO: detect
+    let distro = distro::detect()?;
     let mut ctx = Context::new(distro)?;
     ctx.dry_run = dry_run;
     let profile_path = ctx.profile_dir.join(format!("{}.toml", profile));
@@ -127,39 +127,45 @@ pub fn run(
     let total = controls.len();
     let report = build_report(ctx.hostname.clone(), distro.to_string(), control_reports);
 
-    if let Some(formats) = report_formats {
-        for fmt in formats {
-            let content = match fmt.as_str() {
-                "json" => JsonReporter::new().generate(&report)?,
-                "html" => HtmlReporter::new().generate(&report)?,
-                "junit" => JunitReporter::new().generate(&report)?,
-                "text" => TextReporter::new().generate(&report)?,
-                _ => continue,
+    // Without --report there is still a result to communicate, so the human
+    // report is the default. --quiet keeps the exit code as the only output.
+    let formats = match report_formats {
+        Some(formats) => formats,
+        None if quiet => Vec::new(),
+        None => vec!["text".to_string()],
+    };
+
+    for fmt in formats {
+        let content = match fmt.as_str() {
+            "json" => JsonReporter::new().generate(&report)?,
+            "html" => HtmlReporter::new().generate(&report)?,
+            "junit" => JunitReporter::new().generate(&report)?,
+            "text" => TextReporter::new().generate(&report)?,
+            _ => continue,
+        };
+        if let Some(output_path) = output {
+            let ext = match fmt.as_str() {
+                "json" => "json",
+                "html" => "html",
+                "junit" => "xml",
+                "text" => "txt",
+                _ => "txt",
             };
-            if let Some(output_path) = output {
-                let ext = match fmt.as_str() {
-                    "json" => "json",
-                    "html" => "html",
-                    "junit" => "xml",
-                    "text" => "txt",
-                    _ => "txt",
-                };
-                let path = if output_path.extension().and_then(|e| e.to_str()) == Some(ext) {
-                    output_path.to_path_buf()
-                } else {
-                    std::fs::create_dir_all(output_path)?;
-                    output_path.join(format!("vallumix-report.{}", ext))
-                };
-                if let Some(parent) = path.parent() {
-                    std::fs::create_dir_all(parent)?;
-                }
-                std::fs::write(&path, content)?;
-                if !quiet {
-                    println!("Report written to {}", path.display());
-                }
-            } else if !quiet {
-                println!("{}", content);
+            let path = if output_path.extension().and_then(|e| e.to_str()) == Some(ext) {
+                output_path.to_path_buf()
+            } else {
+                std::fs::create_dir_all(output_path)?;
+                output_path.join(format!("vallumix-report.{}", ext))
+            };
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent)?;
             }
+            std::fs::write(&path, content)?;
+            if !quiet {
+                println!("Report written to {}", path.display());
+            }
+        } else if !quiet {
+            println!("{}", content);
         }
     }
 
