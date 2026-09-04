@@ -48,13 +48,17 @@ jobs:
       - name: Build release binary
         run: cross build --target ${{ matrix.target }} --release -p vallumix-cli
 
-      - name: Strip binary
-        run: |
-          strip target/${{ matrix.target }}/release/vallumix || true
-
+      # Symbols are stripped at link time by [profile.release] strip = true in
+      # the workspace Cargo.toml, which works for every cross-compiled target.
       - name: Compress with UPX
         run: |
-          upx --best --strip-relocs=0 target/${{ matrix.target }}/release/vallumix || true
+          BIN=target/${{ matrix.target }}/release/vallumix
+          # UPX cannot pack every target/toolchain combination. A failure here
+          # only costs download size, so it must not fail the release — but it
+          # must be visible instead of silent.
+          if ! upx --best --strip-relocs=0 "$BIN"; then
+            echo "::warning::UPX compression failed for ${{ matrix.target }}; shipping the uncompressed binary."
+          fi
 
       - name: Rename binary
         run: |
@@ -63,14 +67,16 @@ jobs:
       - name: Generate packages (x86_64 deb)
         if: matrix.target == 'x86_64-unknown-linux-musl'
         run: |
-          cargo deb --release --target ${{ matrix.target }} -p vallumix-cli || true
-          cp target/${{ matrix.target }}/debian/*.deb ./ || true
+          cargo deb --no-build --target ${{ matrix.target }} -p vallumix-cli
+          cp target/${{ matrix.target }}/debian/*.deb ./
 
       - name: Generate packages (aarch64 rpm)
         if: matrix.target == 'aarch64-unknown-linux-musl'
         run: |
-          cargo generate-rpm --target ${{ matrix.target }} -p vallumix-cli || true
-          cp target/${{ matrix.target }}/generate-rpm/*.rpm ./ || true
+          # cargo-generate-rpm's -p takes the package DIRECTORY relative to the
+          # workspace root, not the crate name (unlike cargo-deb's -p).
+          cargo generate-rpm --target ${{ matrix.target }} -p crates/vallumix-cli
+          cp target/${{ matrix.target }}/generate-rpm/*.rpm ./
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -173,7 +179,7 @@ jobs:
           cd release
           for file in vallumix-* *.deb *.rpm *.cdx.json SHA256SUMS; do
             if [ -f "$file.sig" ]; then
-              cosign verify-blob --certificate "$file.cert" --signature "$file.sig" --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-identity-regexp 'https://github.com/jorgealonsodev/vallumix/.github/workflows/release.yml@refs/tags/.*' "$file" || true
+              cosign verify-blob --certificate "$file.cert" --signature "$file.sig" --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-identity-regexp 'https://github.com/jorgealonsodev/vallumix/.github/workflows/release.yml@refs/tags/.*' "$file"
             fi
           done
 
@@ -201,26 +207,3 @@ jobs:
       upload-assets: true
       provenance-name: "vallumix-provenance.intoto.jsonl"
 
-  publish-crates:
-    needs: [release, provenance]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install Rust
-        run: rustup show
-
-      - name: Cargo publish dry-run
-        run: |
-          cargo publish -p vallumix-cli --dry-run
-
-      - name: Publish crate to crates.io
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          cargo publish -p vallumix-cli

@@ -50,11 +50,17 @@ maintainer = "Vallumix Contributors <vallumix@example.com>"
 section = "admin"
 priority = "optional"
 depends = "libc6"
+extended-description = """\
+Vallumix audits and hardens Linux servers against CIS benchmarks. It ships \
+70+ controls covering SSH, networking, filesystem permissions, services, \
+logging and authentication, reports in HTML, JSON, JUnit and plain text, and \
+takes a versioned backup before every change so any control can be rolled \
+back individually or by session."""
 assets = [
     ["target/release/vallumix", "usr/bin/vallumix", "755"],
     ["../../man/vallumix.1", "usr/share/man/man1/vallumix.1", "644"],
-    ["target/release/completions/vallumix.bash", "usr/share/bash-completion/completions/vallumix", "644"],
-    ["target/release/completions/_vallumix", "usr/share/zsh/vendor-completions/_vallumix", "644"],
+    ["../../completions/vallumix.bash", "usr/share/bash-completion/completions/vallumix", "644"],
+    ["../../completions/_vallumix", "usr/share/zsh/vendor-completions/_vallumix", "644"],
 ]
 
 [package.metadata.generate-rpm]

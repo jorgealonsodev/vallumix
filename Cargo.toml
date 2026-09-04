@@ -53,3 +53,9 @@ vallumix-controls = { path = "crates/vallumix-controls" }
 vallumix-reporters = { path = "crates/vallumix-reporters" }
 vallumix-backup = { path = "crates/vallumix-backup" }
 vallumix-cli = { path = "crates/vallumix-cli" }
+
+[profile.release]
+# Strip symbols at link time so every target (including cross-compiled ones)
+# ships a stripped binary without relying on a host `strip` that cannot read
+# foreign architectures.
+strip = true
